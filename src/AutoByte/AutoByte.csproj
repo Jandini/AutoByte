@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <BaseOutputPath>..\..\bin</BaseOutputPath>
+    <Authors>Matt Janda</Authors>
+    <PackageIcon>byte.png</PackageIcon>
+    <PackageId>AutoByte</PackageId>
+    <AssemblyName>AutoByte</AssemblyName>
+    <RootNamespace>AutoByte</RootNamespace>
+    <Description>Data strucure deserializer</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>autobyte byteslide data structure deserializer</PackageTags>
+    <RepositoryUrl>https://github.com/Jandini/AutoByte</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Jandini/AutoByte</PackageProjectUrl>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\byte.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>  
+  <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

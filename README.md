@@ -1,2 +1,6 @@
 # AutoByte
-A byte structure deserializer
+
+[![.NET](https://github.com/Jandini/AutoByte/actions/workflows/build.yml/badge.svg)](https://github.com/Jandini/AutoByte/actions/workflows/build.yml)
+[![NuGet](https://github.com/Jandini/AutoByte/actions/workflows/nuget.yml/badge.svg)](https://github.com/Jandini/AutoByte/actions/workflows/nuget.yml)
+
+Data structure deserializer
