@@ -31,8 +31,5 @@ jobs:
       with:
         dotnet-version: 7.0.x
 
-    - name: Build
-      run: nuget build --configuration:Release
-
     - name: Pack
-      run: nuget pack --no-build
+      run: dotnet pack -c:Release
