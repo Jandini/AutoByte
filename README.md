@@ -31,15 +31,15 @@ Create DTO class for the license object and apply IByteStructure implementation 
 ```c#
 public class License : IByteStructure
 {
-	public short Length { get; set; }
-	public string? Text { get; set; }
+    public short Length { get; set; }
+    public string? Text { get; set; }   
 
-	public int Deserialize(ref ByteSlide slide)
-	{
-		Length = slide.GetInt16LittleEndian();
-		Text = slide.GetUTF8String(Length);
-		return 0;
-	}
+    public int Deserialize(ref ByteSlide slide)
+    {
+        Length = slide.GetInt16LittleEndian();
+        Text = slide.GetUTF8String(Length);
+        return 0;
+    }
 }
 ```
 
