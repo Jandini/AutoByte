@@ -133,7 +133,7 @@ namespace AutoByte
         public string GetString(Encoding encoding, int length) => encoding.GetString(Slide(length));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string GetUTF8String(int length) => Encoding.UTF8.GetString(Slide(length));
+        public string GetUtf8String(int length) => Encoding.UTF8.GetString(Slide(length));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetUnicodeString(int length) => Encoding.Unicode.GetString(Slide(length));

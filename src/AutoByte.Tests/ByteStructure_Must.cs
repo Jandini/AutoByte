@@ -12,7 +12,7 @@ namespace AutByte.Tests
             public int Deserialize(ref ByteSlide slide)
             {
                 Length = slide.GetInt16LittleEndian();
-                Text = slide.GetUTF8String(Length);
+                Text = slide.GetUtf8String(Length);
                 return 0;
             }
         }
@@ -40,6 +40,7 @@ namespace AutByte.Tests
 
             Assert.Equal(EXPECTED_LENGTH, license.Length);
             Assert.Equal(EXPECTED_TEXT, license.Text);
+            Assert.Equal(EXPECTED_LENGTH, license.Text.Length);
         }
     }
 }

@@ -38,7 +38,7 @@ public class License : IByteStructure
     public int Deserialize(ref ByteSlide slide)
     {
         Length = slide.GetInt16LittleEndian();
-        Text = slide.GetUTF8String(Length);
+        Text = slide.GetUtf8String(Length);
         return 0;
     }
 }
