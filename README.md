@@ -9,7 +9,7 @@ Data structure deserializer
 
 ## Quick Start
 
-In the given example the first two bytes represents length of the UTF8 string. The string that follows contains part of the MIT license and it's length is defined by first two bytes.
+The sample data structure consists of two bytes and text with a length stored in the first two bytes.
 
 ```c#
 Offset      0  1  2  3  4  5  6  7   8  9 10 11 12 13 14 15
