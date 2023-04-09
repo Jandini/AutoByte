@@ -32,7 +32,7 @@ Create DTO class for the license object and apply IByteStructure implementation 
 public class License : IByteStructure
 {
     public short Length { get; set; }
-    public string? Text { get; set; }   
+    public string Text { get; set; }   
 
     public int Deserialize(ref ByteSlide slide)
     {
@@ -45,7 +45,7 @@ public class License : IByteStructure
 
 
 
-Use ByteSlide to deserialize data structure into DTO:
+Use ByteSlide to deserialize data structure into DTO class:
 
 ```c#
 [Fact]
@@ -65,10 +65,13 @@ public void Test1()
     };
 
     var slide = new ByteSlide(data);
-    var license = slide.GetStructure<License>();
+    var license = slide.GetStructure<LicenseText>();
 
-    Assert.Equal(126, license.Length);
-    Assert.Equal("MIT License\r\n\r\nCopyright (c) 2023 Matt Janda\r\n\r\nPermission is hereby granted, free of charge, to any person obtaining a copy\r\n", license.Text);           
+    const int EXCPECTED_LENGTH = 126;
+    const string EXPECTED_TEXT = "MIT License\r\n\r\nCopyright (c) 2023 Matt Janda\r\n\r\nPermission is hereby granted, free of charge, to any person obtaining a copy\r\n";
+
+    Assert.Equal(EXCPECTED_LENGTH, license.Length);
+    Assert.Equal(EXPECTED_TEXT, license.Text);       
 }
 ```
 
@@ -80,6 +83,6 @@ public void Test1()
 
 ### Resources
 
-* Byte icon was downloaded from [Flaticon](https://www.flaticon.com/free-icon/byte_5044438).
+Byte icon was downloaded from [Flaticon](https://www.flaticon.com/free-icon/byte_5044438)
 
 
