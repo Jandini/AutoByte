@@ -33,4 +33,4 @@ jobs:
 
     - name: Push
       if: github.ref == 'refs/heads/main'
-      run: dotnet nuget push "bin/*.nupkg" -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+      run: dotnet nuget push "bin/Release/*.nupkg" -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
