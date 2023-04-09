@@ -12,7 +12,7 @@ Data structure deserializer
 The sample data structure consists of two bytes and text with a length stored in the first two bytes.
 
 ```c#
-Offset      0  1  2  3  4  5  6  7   8  9 10 11 12 13 14 15
+Offset      0  1  2  3  4  5  6  7   8  9  A  B  C  D  E  F
 
 00000000   7E 00 4D 49 54 20 4C 69  63 65 6E 73 65 0D 0A 0D   ~ MIT License   
 00000016   0A 43 6F 70 79 72 69 67  68 74 20 28 63 29 20 32    Copyright (c) 2
@@ -67,10 +67,10 @@ public void Test1()
     var slide = new ByteSlide(data);
     var license = slide.GetStructure<LicenseText>();
 
-    const int EXCPECTED_LENGTH = 126;
+    const int EXPECTED_LENGTH = 126;
     const string EXPECTED_TEXT = "MIT License\r\n\r\nCopyright (c) 2023 Matt Janda\r\n\r\nPermission is hereby granted, free of charge, to any person obtaining a copy\r\n";
 
-    Assert.Equal(EXCPECTED_LENGTH, license.Length);
+    Assert.Equal(EXPECTED_LENGTH, license.Length);
     Assert.Equal(EXPECTED_TEXT, license.Text);       
 }
 ```
