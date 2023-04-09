@@ -4,7 +4,7 @@ namespace AutByte.Tests
 {
     public class UnitTest1
     {
-        public class License : IByteStructure
+        public class LicenseText : IByteStructure
         {
             public short Length { get; set; }
             public string? Text { get; set; }
@@ -33,10 +33,13 @@ namespace AutByte.Tests
             };
 
             var slide = new ByteSlide(data);
-            var license = slide.GetStructure<License>();
+            var license = slide.GetStructure<LicenseText>();
 
-            Assert.Equal(126, license.Length);
-            Assert.Equal("MIT License\r\n\r\nCopyright (c) 2023 Matt Janda\r\n\r\nPermission is hereby granted, free of charge, to any person obtaining a copy\r\n", license.Text);            
+            const int EXCPECTED_LENGTH = 126;
+            const string EXPECTED_TEXT = "MIT License\r\n\r\nCopyright (c) 2023 Matt Janda\r\n\r\nPermission is hereby granted, free of charge, to any person obtaining a copy\r\n"
+
+            Assert.Equal(EXCPECTED_LENGTH, license.Length);
+            Assert.Equal(EXPECTED_TEXT, license.Text);
         }
     }
 }
