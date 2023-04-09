@@ -11,6 +11,10 @@ on:
   pull_request:
     branches: 'main'
 
+defaults:
+  run:
+    working-directory: src
+
 jobs:
   build:
 
@@ -28,9 +32,11 @@ jobs:
         dotnet-version: 7.0.x
 
     - name: Pack
-      working-directory: src
       run: dotnet pack -c:Release
 
+    - name: Test
+      run: dotnet test
+
     - name: Push
-      #if: github.ref == 'refs/heads/main'
-      run: dotnet nuget push "bin/Release/*.nupkg" -k ${{ secrets.PACKAGES_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+      if: github.ref == 'refs/heads/main'
+      run: dotnet nuget push "../bin/Release/*.nupkg" -k ${{ secrets.PACKAGES_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
