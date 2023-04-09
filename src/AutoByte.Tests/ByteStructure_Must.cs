@@ -2,7 +2,7 @@ using AutoByte;
 
 namespace AutByte.Tests
 {
-    public class UnitTest1
+    public class ByteStructure_Must
     {
         public class LicenseText : IByteStructure
         {
@@ -18,7 +18,7 @@ namespace AutByte.Tests
         }
 
         [Fact]
-        public void Test1()
+        public void Deserialize_Text()
         {
             var data = new byte[] {
 
@@ -35,10 +35,10 @@ namespace AutByte.Tests
             var slide = new ByteSlide(data);
             var license = slide.GetStructure<LicenseText>();
 
-            const int EXCPECTED_LENGTH = 126;
+            const int EXPECTED_LENGTH = 126;
             const string EXPECTED_TEXT = "MIT License\r\n\r\nCopyright (c) 2023 Matt Janda\r\n\r\nPermission is hereby granted, free of charge, to any person obtaining a copy\r\n";
 
-            Assert.Equal(EXCPECTED_LENGTH, license.Length);
+            Assert.Equal(EXPECTED_LENGTH, license.Length);
             Assert.Equal(EXPECTED_TEXT, license.Text);
         }
     }
