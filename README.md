@@ -45,7 +45,7 @@ public class License : IByteStructure
 
 
 
-Use ByteSlide to deserialize data structure into DTO:
+Use ByteSlide to deserialize data structure into DTO class:
 
 ```c#
 [Fact]
@@ -83,6 +83,6 @@ public void Test1()
 
 ### Resources
 
-* Byte icon was downloaded from [Flaticon](https://www.flaticon.com/free-icon/byte_5044438).
+Byte icon was downloaded from [Flaticon](https://www.flaticon.com/free-icon/byte_5044438)
 
 
