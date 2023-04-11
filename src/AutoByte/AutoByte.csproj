@@ -8,20 +8,21 @@
     <AssemblyName>AutoByte</AssemblyName>
     <RootNamespace>AutoByte</RootNamespace>
     <Description>Data strucure deserializer</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>		
     <PackageTags>autobyte byteslide data structure deserializer</PackageTags>
     <RepositoryUrl>https://github.com/Jandini/AutoByte</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Jandini/AutoByte</PackageProjectUrl>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="..\..\byte.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
+    <None Include="..\..\byte.png" Pack="true" PackagePath=""/>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>  
   <ItemGroup>
     <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
