@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<BaseOutputPath>..\..\bin</BaseOutputPath>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>10</LangVersion>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Authors>Matt Janda</Authors>
+		<PackageIcon>byte.png</PackageIcon>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>		
+		<PackageId>AutoByte.Generator</PackageId>
+		<AssemblyName>AutoByte.Generator</AssemblyName>
+		<RootNamespace>AutoByte.Generator</RootNamespace>
+		<Description>Source code generator for AutoByte</Description>
+		<PackageTags>autobyte generator byteslide data structure deserializer</PackageTags>
+		<RepositoryUrl>https://github.com/Jandini/AutoByte</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/Jandini/AutoByte</PackageProjectUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\byte.png" Pack="true" PackagePath="" />
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+    		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+      			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      			<PrivateAssets>all</PrivateAssets>
+    		</PackageReference>
+    		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
+	</ItemGroup>
+</Project>

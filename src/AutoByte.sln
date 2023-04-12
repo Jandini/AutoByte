@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoByte", "AutoByte\AutoBy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoByte.Tests", "AutoByte.Tests\AutoByte.Tests.csproj", "{C62D95C9-03FA-4835-95F0-2FA12029BC0F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoByte.Generator", "AutoByte.Generator\AutoByte.Generator.csproj", "{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C62D95C9-03FA-4835-95F0-2FA12029BC0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C62D95C9-03FA-4835-95F0-2FA12029BC0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C62D95C9-03FA-4835-95F0-2FA12029BC0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
