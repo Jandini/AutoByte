@@ -1,7 +1,10 @@
 ﻿using AutoByte;
 
-[AutoByteStructure]
-public partial class DemoStructure
+namespace Demo
 {
-    public Int32 Krowa { get; set; }
+    [AutoByteStructure(Size = 45)]
+    public partial class DemoStructure
+    {
+        public Int32 Krowa { get; set; }
+    }
 }
