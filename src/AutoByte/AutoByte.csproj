@@ -37,9 +37,6 @@
     		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoByte.Generators\AutoByte.Generators.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="$(OutputPath)\..\netstandard2.0\$(AssemblyName).Generators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 </Project>
