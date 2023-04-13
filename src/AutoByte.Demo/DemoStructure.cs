@@ -1,8 +1,7 @@
-﻿namespace AutoByte.Tests
+﻿using AutoByte;
+
+[AutoByteStructure]
+public partial class DemoStructure
 {
-    [AutoByteStructure]
-    public partial class DemoStructure 
-    {
-        public Int32 Krowa { get; set; }
-    }
+    public Int32 Krowa { get; set; }
 }

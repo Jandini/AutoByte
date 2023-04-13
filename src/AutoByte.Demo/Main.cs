@@ -1,5 +1,4 @@
 ﻿using AutoByte;
-using AutoByte.Tests;
 using Microsoft.Extensions.Logging;
 
 internal class Main
