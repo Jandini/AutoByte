@@ -13,6 +13,7 @@
 		<DebugSymbols>false</DebugSymbols>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="AutoByte" Version="0.1.1-code-generator.15" />
 		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,10 +23,5 @@
 		<PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
 		<PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
-	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\AutoByte\AutoByte.csproj" />
-          <ProjectReference Include="..\AutoByte.Generators\AutoByte.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-
 	</ItemGroup>
 </Project>
