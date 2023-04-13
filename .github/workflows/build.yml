@@ -41,4 +41,4 @@ jobs:
 
     - name: Push
       if: github.ref == 'refs/heads/code-generator'
-      run: dotnet nuget push "../bin/Release/*.nupkg" -k ${{ secrets.PACKAGES_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+      run: dotnet nuget push "../bin/Release/*.nupkg" -k ${{ secrets.PACKAGE_REGISTRY_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
