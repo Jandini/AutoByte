@@ -32,7 +32,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AutoByte\AutoByte.csproj" />
+    <ProjectReference Include="..\AutoByte.Generators\AutoByte.Generators.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(OutputPath)\..\netstandard2.0\$(AssemblyName).Generators.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
