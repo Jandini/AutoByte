@@ -30,6 +30,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 7.0.x
+        source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
 
     - name: Pack
       run: dotnet pack -c:Release
