@@ -7,7 +7,7 @@
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<IsPackable>false</IsPackable>
 		<LangVersion>10</LangVersion>
-		<IncludeBuildOutput>false</IncludeBuildOutput>	
+		<IncludeBuildOutput>true</IncludeBuildOutput>	
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
