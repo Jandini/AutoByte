@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>10</LangVersion>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -18,9 +19,9 @@
 		<PackageIcon>byte.png</PackageIcon>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>		
-		<PackageId>AutoByte.Generator</PackageId>
-		<AssemblyName>AutoByte.Generator</AssemblyName>
-		<RootNamespace>AutoByte.Generator</RootNamespace>
+		<PackageId>AutoByte.Generators</PackageId>
+		<AssemblyName>AutoByte.Generators</AssemblyName>
+		<RootNamespace>AutoByte</RootNamespace>
 		<Description>Source code generator for AutoByte</Description>
 		<PackageTags>autobyte generator byteslide data structure deserializer</PackageTags>
 		<RepositoryUrl>https://github.com/Jandini/AutoByte</RepositoryUrl>
