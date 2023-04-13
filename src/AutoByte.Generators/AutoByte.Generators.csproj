@@ -16,23 +16,9 @@
 
 	<PropertyGroup>
 		<Authors>Matt Janda</Authors>
-		<PackageIcon>byte.png</PackageIcon>
-		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<PackageReadmeFile>README.md</PackageReadmeFile>		
-		<PackageId>AutoByte.Generators</PackageId>
-		<AssemblyName>AutoByte.Generators</AssemblyName>
 		<RootNamespace>AutoByte</RootNamespace>
 		<Description>Source code generator for AutoByte</Description>
-		<PackageTags>autobyte generator byteslide data structure deserializer</PackageTags>
-		<RepositoryUrl>https://github.com/Jandini/AutoByte</RepositoryUrl>
-		<PackageProjectUrl>https://github.com/Jandini/AutoByte</PackageProjectUrl>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\byte.png" Pack="true" PackagePath="" />
-		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
-		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
