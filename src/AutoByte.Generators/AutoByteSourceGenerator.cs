@@ -54,16 +54,32 @@ namespace AutoByte
                     continue;
 
 
+                // Get the properties of the class
+                var properties = classSymbol.GetMembers()
+                    .Where(x => x.Kind == SymbolKind.Property)
+                    .Select(x => (IPropertySymbol)x);
+
+                var codeBuilder = new StringBuilder();
+                
+                foreach (var property in properties)
+                {
+                    string name = property.Name;
+                    string type = property.Type.ToString();
+                    codeBuilder.AppendLine($"{name} = slide.GetInt32LittleEndian();");
+                }
+                
+                
+                string generatedCode = codeBuilder.ToString();
                 var structureSize = autoByteAttribute.Size;
                 var className = classDeclaration.Identifier.ToString();
                 var namespaceName = classDeclaration.GetNamespace();
 
-                var source = GenerateDeserializeImplementation(namespaceName, className, structureSize);
+                var source = GenerateDeserializeImplementation(namespaceName, className, structureSize, generatedCode);
                 context.AddSource($"{className}.g.cs", SourceText.From(source, Encoding.UTF8));
             }
         }
 
-        private string GenerateDeserializeImplementation(string namespaceName, string className, int structureSize)
+        private string GenerateDeserializeImplementation(string namespaceName, string className, int structureSize, string generatedCode)
         {
             return $@"using AutoByte;
 
@@ -73,6 +89,7 @@ namespace AutoByte
     {{
         public int Deserialize(ref ByteSlide slide)
         {{
+            {generatedCode}
             return {structureSize};
         }}
     }}
