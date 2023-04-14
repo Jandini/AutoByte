@@ -5,4 +5,4 @@
     {
         public Int32 Krowa { get; set; }
     }
-}
+}   

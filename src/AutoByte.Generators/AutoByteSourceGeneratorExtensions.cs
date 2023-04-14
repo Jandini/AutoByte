@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Reflection;
+using System.Collections.Immutable;
 
 namespace AutoByte
 {
@@ -35,6 +36,7 @@ namespace AutoByte
         }
 
 
+        public static T GetAttribute<T>(this ImmutableArray<AttributeData> attributes) where T : Attribute => attributes.FirstOrDefault(a => a.AttributeClass.Name == nameof(T)).ToInstance<T>();
 
         public static T ToInstance<T>(this AttributeData attributeData) where T : Attribute
         {

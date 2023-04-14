@@ -2,7 +2,9 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 
 namespace AutoByte
@@ -12,7 +14,7 @@ namespace AutoByte
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-#if DEBUG_
+#if DEBUG
             if (!Debugger.IsAttached)
             {
                 Debugger.Launch();
@@ -43,16 +45,15 @@ namespace AutoByte
                 INamedTypeSymbol classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration);
 
                 if (classSymbol == null)
-                    continue; 
+                    continue;
 
                 // Get the attribute and its property value
-                AutoByteStructureAttribute autoByteAttribute = classSymbol.GetAttributes()
-                    .FirstOrDefault(x => x.AttributeClass.Name == "AutoByteStructureAttribute")
-                    .ToInstance<AutoByteStructureAttribute>();
+                AutoByteStructureAttribute autoByteAttribute = classSymbol
+                    .GetAttributes()
+                    .GetAttribute<AutoByteStructureAttribute>();
 
                 if (autoByteAttribute == null)
                     continue;
-
 
                 // Get the properties of the class
                 var properties = classSymbol.GetMembers()
@@ -60,15 +61,19 @@ namespace AutoByte
                     .Select(x => (IPropertySymbol)x);
 
                 var codeBuilder = new StringBuilder();
-                
+                var endian = autoByteAttribute.IsBigEndian ? "BigEndian" : "LittleEndian";
+
                 foreach (var property in properties)
                 {
-                    string name = property.Name;
-                    string type = property.Type.ToString();
-                    codeBuilder.AppendLine($"{name} = slide.GetInt32LittleEndian();");
+                    var propertyName = property.Name;
+                    var methodName = GetMethodName(property, endian);                   
+
+                    if (string.IsNullOrEmpty(propertyName))
+                        continue;
+
+                    codeBuilder.AppendLine($"{" ",12}{propertyName} = slide.{methodName};");
                 }
-                
-                
+
                 string generatedCode = codeBuilder.ToString();
                 var structureSize = autoByteAttribute.Size;
                 var className = classDeclaration.Identifier.ToString();
@@ -77,6 +82,48 @@ namespace AutoByte
                 var source = GenerateDeserializeImplementation(namespaceName, className, structureSize, generatedCode);
                 context.AddSource($"{className}.g.cs", SourceText.From(source, Encoding.UTF8));
             }
+        }
+
+
+        private string GetMethodName(IPropertySymbol property, string endian)
+        {
+            string propertyType = property.Type.ToString();
+
+            string method = propertyType switch
+            {
+                "byte" => $"GetByte()",
+                "short" => $"GetInt16{endian}()",
+                "int" => $"GetInt32{endian}()",
+                "long" => $"GetInt64{endian}()",
+                "ushort" => $"GetUInt16{endian}()",
+                "uint" => $"GetUInt32{endian}()",
+                "ulong" => $"GetUInt64{endian}()",
+                // "string" => GetStringMethodName(property), 
+                _ => throw new Exception($"AutoByte code generator does not support {propertyType}."),
+            };
+            return method;
+
+        }
+
+        private string GetStringMethodName(IPropertySymbol property)
+        {
+            throw new NotImplementedException();
+
+            //AutoByteFieldAttribute fieldAttribute = null;
+
+            //var attributes = property.GetAttributes();
+
+            //if (attributes != null && attributes.Length > 0)
+            //{
+            //    fieldAttribute = attributes.GetAttribute<AutoByteFieldAttribute>();
+
+            //    fieldAttribute = attributes
+            //        .FirstOrDefault(a => a.AttributeClass.Name == "AutoByteFieldAttribute")
+            //        .ToInstance<AutoByteFieldAttribute>();
+            //}
+
+
+            //return fieldAttribute != null ? $"GetUtf8String({fieldAttribute.Size})" : throw new Exception($"{property.Name} is missing AutoByteString attribute."),
         }
 
         private string GenerateDeserializeImplementation(string namespaceName, string className, int structureSize, string generatedCode)
@@ -89,7 +136,7 @@ namespace AutoByte
     {{
         public int Deserialize(ref ByteSlide slide)
         {{
-            {generatedCode}
+{generatedCode}
             return {structureSize};
         }}
     }}

@@ -10,5 +10,10 @@
         /// Structure size in bytes. This property is optional. 
         /// </summary>
         public int Size { get; set; }
+
+        /// <summary>
+        /// Apply BigEndian.
+        /// </summary>
+        public bool IsBigEndian { get; set; }
     }
 }

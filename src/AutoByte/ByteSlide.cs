@@ -36,9 +36,12 @@ namespace AutoByte
             _slide = _slide[length..];
             return slice;
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Skip(int length) => _slide = _slide[length..];
+        public ByteSlide Skip(int length) { 
+            _slide = _slide[length..]; 
+            return this; 
+        }
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
