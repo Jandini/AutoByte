@@ -39,10 +39,6 @@ namespace AutByte.Tests
             var slide = new ByteSlide(data);
             var license = slide.GetStructure<LicenseText>();
 
-            var str = slide.GetStructure<GeneratorTest>();
-
-
-
             const int EXPECTED_LENGTH = 126;
             const string EXPECTED_TEXT = "MIT License\r\n\r\nCopyright (c) 2023 Matt Janda\r\n\r\nPermission is hereby granted, free of charge, to any person obtaining a copy\r\n";
 
