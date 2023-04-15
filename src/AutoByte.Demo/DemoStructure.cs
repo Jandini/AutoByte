@@ -2,7 +2,6 @@
 
 namespace Demo
 {
-
     public enum DemoType : byte
     {
         First = 0, 

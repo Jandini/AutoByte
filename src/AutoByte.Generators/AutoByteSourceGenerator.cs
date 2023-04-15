@@ -2,9 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using System;
 using System.Diagnostics;
-using System.Reflection;
 using System.Text;
 
 namespace AutoByte
@@ -14,7 +12,7 @@ namespace AutoByte
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-#if DEBUG
+#if DEBUG_
             if (!Debugger.IsAttached)
             {
                 Debugger.Launch();
