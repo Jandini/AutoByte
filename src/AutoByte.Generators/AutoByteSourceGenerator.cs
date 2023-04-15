@@ -90,6 +90,7 @@ namespace AutoByte
             string propertyType = property.Type.ToString();
             string enumType = string.Empty;
 
+            // For Enum types get underlaying property type
             if (property.Type.TypeKind == TypeKind.Enum)
             {
                 enumType = $"<{propertyType}>";

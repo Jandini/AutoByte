@@ -9,15 +9,14 @@ namespace Demo
         Last = 1,
     }
 
-    [AutoByteStructure(Size = 45)]
+    [AutoByteStructure(Size = 45, IsBigEndian = true)]
     public partial class DemoStructure
     {        
         public DemoType Length { get; set; }
-        public Int32 Length1 { get; set; }
-        public Int32 Length2 { get; set; }
+        public int Length1 { get; set; }
+        public ulong Length2 { get; set; }
 
         //[AutoByteString(Size = 10)]
         //public string Text { get; set; }
-
     }
 }
