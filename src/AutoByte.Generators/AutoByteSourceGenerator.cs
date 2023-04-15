@@ -48,9 +48,9 @@ namespace AutoByte
                     continue;
 
                 // Get the attribute and its property value
-                AutoByteStructureAttribute autoByteAttribute = classSymbol
-                    .GetAttributes()
-                    .GetAttribute<AutoByteStructureAttribute>();
+                AutoByteStructureAttribute autoByteAttribute = classSymbol.GetAttributes()
+                    .FirstOrDefault(x => x.AttributeClass.Name == "AutoByteStructureAttribute")
+                    .ToInstance<AutoByteStructureAttribute>();
 
                 if (autoByteAttribute == null)
                     continue;
@@ -73,8 +73,8 @@ namespace AutoByte
 
                     codeBuilder.AppendLine($"{" ",12}{propertyName} = slide.{methodName};");
                 }
-
-                string generatedCode = codeBuilder.ToString();
+                
+                string generatedCode = codeBuilder.ToString().TrimEnd('\r', '\n');
                 var structureSize = autoByteAttribute.Size;
                 var className = classDeclaration.Identifier.ToString();
                 var namespaceName = classDeclaration.GetNamespace();
@@ -140,7 +140,6 @@ namespace AutoByte
             return {structureSize};
         }}
     }}
-
 {(string.IsNullOrEmpty(namespaceName) ? null : $@"}}")}
 ";
         }
@@ -158,8 +157,11 @@ namespace AutoByte
                         .SelectMany(a => a.Attributes)
                         .FirstOrDefault(a => a.Name.ToString() == "AutoByteStructure");
 
-                    if (autoByteStructureAttribute != null && classDeclaration.IsPartial())
+                    if (autoByteStructureAttribute != null)
                     {
+                        if (!classDeclaration.IsPartial())
+                            throw new Exception("Use partial class with AutoByteStructure attribute."); 
+
                         CandidateClasses.Add(classDeclaration);
                     }
                 }
