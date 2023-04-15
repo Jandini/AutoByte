@@ -48,9 +48,7 @@ namespace AutoByte
                     continue;
 
                 // Get the attribute and its property value
-                AutoByteStructureAttribute autoByteAttribute = classSymbol.GetAttributes()
-                    .FirstOrDefault(x => x.AttributeClass.Name == "AutoByteStructureAttribute")
-                    .ToInstance<AutoByteStructureAttribute>();
+                var autoByteAttribute = classSymbol.GetAttribute<AutoByteStructureAttribute>();
 
                 if (autoByteAttribute == null)
                     continue;
@@ -87,6 +85,12 @@ namespace AutoByte
 
         private string GetMethodName(IPropertySymbol property, string endian)
         {
+            var fieldAttribute = property.GetAttribute<AutoByteUtf8StringAttribute>()
+                ?? property.GetAttribute<AutoByteStringAttribute>()
+                ?? property.GetAttribute<AutoByteFieldAttribute>();
+
+            var skip = GetSkipBytes(fieldAttribute);
+
             string propertyType = property.Type.ToString();
             string enumType = string.Empty;
 
@@ -99,18 +103,25 @@ namespace AutoByte
 
             string method = propertyType switch
             {
-                "byte" => $"GetByte{enumType}()",
-                "short" => $"GetInt16{endian}{enumType}()",
-                "int" => $"GetInt32{endian}{enumType}()",
-                "long" => $"GetInt64{endian}{enumType}()",
-                "ushort" => $"GetUInt16{endian}{enumType}()",
-                "uint" => $"GetUInt32{endian}{enumType}()",
-                "ulong" => $"GetUInt64{endian}{enumType}()",
+                "byte" => $"{skip}GetByte{enumType}()",
+                "short" => $"{skip}GetInt16{endian}{enumType}()",
+                "int" => $"{skip}GetInt32{endian}{enumType}()",
+                "long" => $"{skip}GetInt64{endian}{enumType}()",
+                "ushort" => $"{skip}GetUInt16{endian}{enumType}()",
+                "uint" => $"{skip}GetUInt32{endian}{enumType}()",
+                "ulong" => $"{skip}GetUInt64{endian}{enumType}()",
                 // "string" => GetStringMethodName(property), 
                 _ => throw new Exception($"AutoByte code generator does not support {propertyType}."),
             };
-            return method;
 
+            return method;
+        }
+
+        private string GetSkipBytes(AutoByteFieldAttribute fieldAttribute)
+        {
+            return (fieldAttribute != null && fieldAttribute.Skip > 0)
+                ? $"Skip({fieldAttribute.Skip})."
+                : string.Empty;
         }
 
         private string GetStringMethodName(IPropertySymbol property)

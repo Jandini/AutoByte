@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Reflection;
-using System.Collections.Immutable;
 
 namespace AutoByte
 {
@@ -35,7 +34,12 @@ namespace AutoByte
             return null;
         }
 
-
+        public static T GetAttribute<T>(this ISymbol symbol) where T : Attribute 
+        {
+            return symbol.GetAttributes()
+                .FirstOrDefault(x => x.AttributeClass.Name == typeof(T).Name)
+                .ToInstance<T>();
+        }
 
         public static T ToInstance<T>(this AttributeData attributeData) where T : Attribute
         {

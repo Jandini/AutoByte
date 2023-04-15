@@ -14,6 +14,8 @@ namespace Demo
     {        
         public DemoType Length { get; set; }
         public int Length1 { get; set; }
+        
+        [AutoByteString(Skip = 3)]
         public ulong Length2 { get; set; }
 
         //[AutoByteString(Size = 10)]

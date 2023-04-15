@@ -1,6 +1,6 @@
 ﻿namespace AutoByte
 {
-    [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public class AutoByteFieldAttribute : Attribute
     {
         /// <summary>
