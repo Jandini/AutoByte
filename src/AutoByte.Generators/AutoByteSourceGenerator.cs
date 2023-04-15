@@ -88,16 +88,23 @@ namespace AutoByte
         private string GetMethodName(IPropertySymbol property, string endian)
         {
             string propertyType = property.Type.ToString();
+            string enumType = string.Empty;
+
+            if (property.Type.TypeKind == TypeKind.Enum)
+            {
+                enumType = $"<{propertyType}>";
+                propertyType = (property.Type as INamedTypeSymbol).EnumUnderlyingType.ToDisplayString();
+            }
 
             string method = propertyType switch
             {
-                "byte" => $"GetByte()",
-                "short" => $"GetInt16{endian}()",
-                "int" => $"GetInt32{endian}()",
-                "long" => $"GetInt64{endian}()",
-                "ushort" => $"GetUInt16{endian}()",
-                "uint" => $"GetUInt32{endian}()",
-                "ulong" => $"GetUInt64{endian}()",
+                "byte" => $"GetByte{enumType}()",
+                "short" => $"GetInt16{endian}{enumType}()",
+                "int" => $"GetInt32{endian}{enumType}()",
+                "long" => $"GetInt64{endian}{enumType}()",
+                "ushort" => $"GetUInt16{endian}{enumType}()",
+                "uint" => $"GetUInt32{endian}{enumType}()",
+                "ulong" => $"GetUInt64{endian}{enumType}()",
                 // "string" => GetStringMethodName(property), 
                 _ => throw new Exception($"AutoByte code generator does not support {propertyType}."),
             };
