@@ -58,6 +58,9 @@ namespace AutoByte
 
                 var codeBuilder = new StringBuilder();
                 var endian = autoByteAttribute.IsBigEndian ? "BigEndian" : "LittleEndian";
+                var usings = new StringBuilder();
+                var hasStrings = false;
+
 
                 foreach (var property in properties)
                 {
@@ -67,15 +70,25 @@ namespace AutoByte
                     if (string.IsNullOrEmpty(propertyName))
                         continue;
 
+                    if (!hasStrings && methodName.Contains("String"))
+                        hasStrings = true;
+
+
                     codeBuilder.AppendLine($"{" ",12}{propertyName} = slide.{methodName};");
                 }
-                
+
+                usings.AppendLine("using AutoByte;");
+
+                if (hasStrings)
+                    usings.AppendLine("using System.Text;");
+
+
                 string generatedCode = codeBuilder.ToString().TrimEnd('\r', '\n');
                 var structureSize = autoByteAttribute.Size;
                 var className = classDeclaration.Identifier.ToString();
                 var namespaceName = classDeclaration.GetNamespace();
 
-                var source = GenerateDeserializeImplementation(namespaceName, className, structureSize, generatedCode);
+                var source = GenerateDeserializeImplementation(usings.ToString(), namespaceName, className, structureSize, generatedCode);
                 context.AddSource($"{className}.g.cs", SourceText.From(source, Encoding.UTF8));
             }
         }
@@ -126,20 +139,27 @@ namespace AutoByte
             
             if (fieldAttribute is AutoByteStringAttribute stringField)
             {
-                return stringField.Encoding switch
+                if (stringField.Encoding != null)
                 {
-                    "UTF8" => $"{skip}GetUtf8String({stringField.Size})",
-                    _ => $"{skip}GetString(Encoding.{stringField.Encoding}, {stringField.Size})"
-                };
+                    return stringField.Encoding switch
+                    {
+                        "UTF8" => $"{skip}GetUtf8String({stringField.Size})",
+                        "Unicode" => $"{skip}GetString(Encoding.Unicode, {stringField.Size})",
+                        "BigEndianUnicode" => $"{skip}GetString(Encoding.BigEndianUnicode, {stringField.Size})",
+                        "UTF7" => $"{skip}GetString(Encoding.UTF7, {stringField.Size})",
+                        "UTF32" => $"{skip}GetString(Encoding.UTF32, {stringField.Size})",
+                        _ => $"{skip}GetUtf8String({stringField.Size})"
+                    };
+                }
             }
+
 
             throw new Exception($"Propertry is missing AutoByteString attribute.");          
         }
 
-        private string GenerateDeserializeImplementation(string namespaceName, string className, int structureSize, string generatedCode)
+        private string GenerateDeserializeImplementation(string usings, string namespaceName, string className, int structureSize, string generatedCode)
         {
-            return $@"using AutoByte;
-
+            return $@"{usings}
 {(string.IsNullOrEmpty(namespaceName) ? null : $@"namespace {namespaceName}
 {{")}
     public partial class {className} : IByteStructure

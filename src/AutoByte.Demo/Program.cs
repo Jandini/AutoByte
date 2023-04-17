@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using System.Text;
 
 using var provider = new ServiceCollection()
     .AddLogging(builder => builder.AddSerilog(new LoggerConfiguration()

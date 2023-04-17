@@ -1,6 +1,7 @@
 ﻿using AutoByte;
 using Demo;
 using Microsoft.Extensions.Logging;
+using System.Text;
 
 internal class Main
 {
@@ -14,7 +15,7 @@ internal class Main
     public void Run()
     {
         var demo = new ByteSlide().GetStructure<DemoStructure>();
-
-        _logger.LogInformation("Hello, World!");
+        
+        _logger.LogInformation("Hello, World!");        
     }
 }
