@@ -4,8 +4,11 @@
     public sealed class AutoByteStringAttribute : AutoByteFieldAttribute 
     {
         /// <summary>
-        /// UTF8, ASCII, Unicode, BigEndianUnicode, UTF32, UTF7
-        /// 
+        /// UTF8, ASCII, Unicode, BigEndianUnicode, UTF32, UTF7. Default is UTF8. 
+        /// </summary>
+        public string Encoding { get; set; }
+
+        /// <summary>
         /// Add System.Text.Encoding.CodePages package. 
         /// Call Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         /// Use CodePage property to access other encodings.
@@ -19,6 +22,6 @@
         /// UTF-32 and UTF-32LE(code page 12000), which is returned by the Encoding.UTF32 property.
         /// UTF-32BE (code page 12001), which is instantiated by calling an UTF32Encoding constructor that has a bigEndian parameter and providing a value of true in the method call.
         /// </summary>
-        public string Encoding { get; set; }
+        public int CodePage { get; set; }
     }
 }

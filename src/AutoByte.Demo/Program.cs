@@ -17,6 +17,7 @@ using var provider = new ServiceCollection()
 
 try
 {
+    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     provider.GetRequiredService<Main>().Run();
 }
 catch (Exception ex)

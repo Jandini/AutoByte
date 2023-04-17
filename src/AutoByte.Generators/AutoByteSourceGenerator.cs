@@ -120,7 +120,7 @@ namespace AutoByte
                 "ushort" => $"{skip}GetUInt16{endian}{enumType}()",
                 "uint" => $"{skip}GetUInt32{endian}{enumType}()",
                 "ulong" => $"{skip}GetUInt64{endian}{enumType}()",
-                "string" => GetStringMethodName(fieldAttribute, skip), 
+                "string" => GetStringMethodName(property, fieldAttribute, skip), 
                 _ => throw new Exception($"AutoByte code generator does not support {propertyType}."),
             };
 
@@ -134,7 +134,7 @@ namespace AutoByte
                 : string.Empty;
         }
 
-        private string GetStringMethodName(AutoByteFieldAttribute fieldAttribute, string skip)
+        private string GetStringMethodName(IPropertySymbol property, AutoByteFieldAttribute fieldAttribute, string skip)
         {            
             
             if (fieldAttribute is AutoByteStringAttribute stringField)
@@ -148,13 +148,20 @@ namespace AutoByte
                         "BigEndianUnicode" => $"{skip}GetString(Encoding.BigEndianUnicode, {stringField.Size})",
                         "UTF7" => $"{skip}GetString(Encoding.UTF7, {stringField.Size})",
                         "UTF32" => $"{skip}GetString(Encoding.UTF32, {stringField.Size})",
-                        _ => $"{skip}GetUtf8String({stringField.Size})"
+                        _ => throw new Exception($"Encoding {stringField.Encoding} given in AutoByteStringAttribute for {property.Name} is not supported.")
                     };
+                }
+                else 
+                {
+                    if (stringField.CodePage > 0)
+                        return $"{skip}GetString(Encoding.GetEncoding({stringField.CodePage}), {stringField.Size})";
+                    else
+                        return $"{skip}GetUtf8String({stringField.Size})";
                 }
             }
 
 
-            throw new Exception($"Propertry is missing AutoByteString attribute.");          
+            throw new Exception($"Propertry {property.Name} require AutoByteString attribute.");          
         }
 
         private string GenerateDeserializeImplementation(string usings, string namespaceName, string className, int structureSize, string generatedCode)
