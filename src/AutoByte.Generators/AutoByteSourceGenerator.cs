@@ -129,6 +129,7 @@ namespace AutoByte
                 "ushort" => $"{skip}GetUInt16{endian}{enumType}()",
                 "uint" => $"{skip}GetUInt32{endian}{enumType}()",
                 "ulong" => $"{skip}GetUInt64{endian}{enumType}()",
+                "byte[]" => $"{skip}Slide({fieldAttribute.Size}).ToArray()",
                 "string" => GetStringMethodName(property, fieldAttribute, skip), 
                 _ => throw new Exception($"AutoByte code generator does not support {propertyType}."),
             };
@@ -177,9 +178,10 @@ namespace AutoByte
         {
             return $@"{usings}
 {(string.IsNullOrEmpty(namespaceName) ? null : $@"namespace {namespaceName}
-{{")}
+{{")}        
     {classAccessibility} partial class {className} : IByteStructure
     {{
+        {(structureSize > 0 ? $@"public static int StructureSize = {structureSize};" : null)}
         public int Deserialize(ref ByteSlide slide)
         {{
 {generatedCode}
