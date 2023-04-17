@@ -10,7 +10,7 @@ namespace Demo
     }
 
     [AutoByteStructure(Size = 45, IsBigEndian = true)]
-    public partial class DemoStructure
+    internal partial class DemoStructure
     {
         public DemoType Length { get; set; }
         public int Length1 { get; set; }

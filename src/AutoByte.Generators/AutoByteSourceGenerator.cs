@@ -57,9 +57,18 @@ namespace AutoByte
                     .Select(x => (IPropertySymbol)x);
 
                 var codeBuilder = new StringBuilder();
-                var endian = autoByteAttribute.IsBigEndian ? "BigEndian" : "LittleEndian";
-                var usings = new StringBuilder();
+                var usingsBuilder = new StringBuilder();
+
                 var hasStrings = false;
+                var endian = autoByteAttribute.IsBigEndian ? "BigEndian" : "LittleEndian";
+
+                var classAccessibility = classSymbol.DeclaredAccessibility switch
+                {
+                    Accessibility.Public => "public",
+                    Accessibility.Internal => "internal",
+                    Accessibility.Private => "private",
+                    _ => string.Empty
+                };
 
 
                 foreach (var property in properties)
@@ -77,10 +86,10 @@ namespace AutoByte
                     codeBuilder.AppendLine($"{" ",12}{propertyName} = slide.{methodName};");
                 }
 
-                usings.AppendLine("using AutoByte;");
+                usingsBuilder.AppendLine("using AutoByte;");
 
                 if (hasStrings)
-                    usings.AppendLine("using System.Text;");
+                    usingsBuilder.AppendLine("using System.Text;");
 
 
                 string generatedCode = codeBuilder.ToString().TrimEnd('\r', '\n');
@@ -88,7 +97,7 @@ namespace AutoByte
                 var className = classDeclaration.Identifier.ToString();
                 var namespaceName = classDeclaration.GetNamespace();
 
-                var source = GenerateDeserializeImplementation(usings.ToString(), namespaceName, className, structureSize, generatedCode);
+                var source = GenerateDeserializeImplementation(usingsBuilder.ToString(), classAccessibility, namespaceName, className, structureSize, generatedCode);
                 context.AddSource($"{className}.g.cs", SourceText.From(source, Encoding.UTF8));
             }
         }
@@ -164,12 +173,12 @@ namespace AutoByte
             throw new Exception($"Propertry {property.Name} require AutoByteString attribute.");          
         }
 
-        private string GenerateDeserializeImplementation(string usings, string namespaceName, string className, int structureSize, string generatedCode)
+        private string GenerateDeserializeImplementation(string usings, string classAccessibility, string namespaceName, string className, int structureSize, string generatedCode)
         {
             return $@"{usings}
 {(string.IsNullOrEmpty(namespaceName) ? null : $@"namespace {namespaceName}
 {{")}
-    public partial class {className} : IByteStructure
+    {classAccessibility} partial class {className} : IByteStructure
     {{
         public int Deserialize(ref ByteSlide slide)
         {{
