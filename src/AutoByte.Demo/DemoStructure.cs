@@ -1,4 +1,5 @@
 ﻿using AutoByte;
+using System.Text;
 
 namespace Demo
 {
@@ -11,13 +12,13 @@ namespace Demo
     [AutoByteStructure(Size = 45, IsBigEndian = true)]
     public partial class DemoStructure
     {        
-        public DemoType Length { get; set; }
-        public int Length1 { get; set; }
+        //public DemoType Length { get; set; }
+        //public int Length1 { get; set; }
         
-        [AutoByteString(Skip = 3)]
-        public ulong Length2 { get; set; }
+        //[AutoByteField(Skip = 3)]
+        //public ulong Length2 { get; set; }
 
-        //[AutoByteString(Size = 10)]
-        //public string Text { get; set; }
+        [AutoByteString(Encoding = "UTF8", Size = 11)]
+        public string Text { get; set; }
     }
 }

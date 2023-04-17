@@ -12,7 +12,7 @@ namespace AutoByte
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-#if DEBUG_
+#if DEBUG
             if (!Debugger.IsAttached)
             {
                 Debugger.Launch();
@@ -83,8 +83,7 @@ namespace AutoByte
 
         private string GetMethodName(IPropertySymbol property, string endian)
         {
-            var fieldAttribute = property.GetAttribute<AutoByteUtf8StringAttribute>()
-                ?? property.GetAttribute<AutoByteStringAttribute>()
+            var fieldAttribute = property.GetAttribute<AutoByteStringAttribute>()
                 ?? property.GetAttribute<AutoByteFieldAttribute>();
 
             var skip = GetSkipBytes(fieldAttribute);
@@ -108,7 +107,7 @@ namespace AutoByte
                 "ushort" => $"{skip}GetUInt16{endian}{enumType}()",
                 "uint" => $"{skip}GetUInt32{endian}{enumType}()",
                 "ulong" => $"{skip}GetUInt64{endian}{enumType}()",
-                // "string" => GetStringMethodName(property), 
+                "string" => GetStringMethodName(fieldAttribute, skip), 
                 _ => throw new Exception($"AutoByte code generator does not support {propertyType}."),
             };
 
@@ -122,25 +121,19 @@ namespace AutoByte
                 : string.Empty;
         }
 
-        private string GetStringMethodName(IPropertySymbol property)
-        {
-            throw new NotImplementedException();
+        private string GetStringMethodName(AutoByteFieldAttribute fieldAttribute, string skip)
+        {            
+            
+            if (fieldAttribute is AutoByteStringAttribute stringField)
+            {
+                return stringField.Encoding switch
+                {
+                    "UTF8" => $"{skip}GetUtf8String({stringField.Size})",
+                    _ => $"{skip}GetString(Encoding.{stringField.Encoding}, {stringField.Size})"
+                };
+            }
 
-            //AutoByteFieldAttribute fieldAttribute = null;
-
-            //var attributes = property.GetAttributes();
-
-            //if (attributes != null && attributes.Length > 0)
-            //{
-            //    fieldAttribute = attributes.GetAttribute<AutoByteFieldAttribute>();
-
-            //    fieldAttribute = attributes
-            //        .FirstOrDefault(a => a.AttributeClass.Name == "AutoByteFieldAttribute")
-            //        .ToInstance<AutoByteFieldAttribute>();
-            //}
-
-
-            //return fieldAttribute != null ? $"GetUtf8String({fieldAttribute.Size})" : throw new Exception($"{property.Name} is missing AutoByteString attribute."),
+            throw new Exception($"Propertry is missing AutoByteString attribute.");          
         }
 
         private string GenerateDeserializeImplementation(string namespaceName, string className, int structureSize, string generatedCode)

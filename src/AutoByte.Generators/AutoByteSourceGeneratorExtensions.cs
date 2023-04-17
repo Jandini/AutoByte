@@ -54,6 +54,7 @@ namespace AutoByte
             foreach (var argument in attributeData.NamedArguments)
             {
                 var property = properties.FirstOrDefault(x => x.Name == argument.Key);
+                
                 if (property != null)
                 {
                     var value = argument.Value.Value;

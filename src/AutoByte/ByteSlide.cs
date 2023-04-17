@@ -135,14 +135,14 @@ namespace AutoByte
         public string GetString(Encoding encoding, int length) => encoding.GetString(Slide(length));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string GetUtf8String(int length) => Encoding.UTF8.GetString(Slide(length));
+        public string GetUtf8String(int size) => Encoding.UTF8.GetString(Slide(size));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string GetUnicodeString(int length) => Encoding.Unicode.GetString(Slide(length));
+        public string GetUnicodeString(int size) => Encoding.Unicode.GetString(Slide(size));
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte[] GetArray(int length) => Slide(length).ToArray();
+        public byte[] GetByteArray(int length) => Slide(length).ToArray();
 
         
         /// <summary>
@@ -152,7 +152,7 @@ namespace AutoByte
         /// <param name="align">Align to given number of bytes</param>
         /// <returns>An array with given length</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte[] GetArrayAlignTo(int length, int align)
+        public byte[] GetByteArrayAlignTo(int length, int align)
         {
             var result = Slide(length).ToArray();
             

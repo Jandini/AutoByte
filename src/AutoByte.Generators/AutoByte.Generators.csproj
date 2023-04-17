@@ -23,8 +23,8 @@
 
 	<ItemGroup>
 	  <Compile Include="..\AutoByte\AutoByteFieldAttribute.cs" Link="AutoByteFieldAttribute.cs" />
+	  <Compile Include="..\AutoByte\AutoByteStringAttribute.cs" Link="AutoByteStringAttribute.cs" />
 	  <Compile Include="..\AutoByte\AutoByteStructureAttribute.cs" Link="AutoByteStructureAttribute.cs" />
-	  <Compile Include="..\AutoByte\AutoByteUtf8StringAttribute.cs" Link="AutoByteUtf8StringAttribute.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
