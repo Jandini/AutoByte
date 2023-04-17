@@ -38,11 +38,9 @@ namespace AutoByte
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ByteSlide Skip(int length) { 
-            _slide = _slide[length..]; 
-            return this; 
+        public void Skip(int size) { 
+            _slide = _slide[size..];            
         }
-
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte GetByte() => Slide(sizeof(byte))[0];

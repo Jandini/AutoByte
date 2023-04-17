@@ -59,7 +59,6 @@ namespace AutoByte
                 var codeBuilder = new StringBuilder();
                 var usingsBuilder = new StringBuilder();
 
-                var hasStrings = false;
                 var endian = autoByteAttribute.IsBigEndian ? "BigEndian" : "LittleEndian";
 
                 var classAccessibility = classSymbol.DeclaredAccessibility switch
@@ -74,21 +73,28 @@ namespace AutoByte
                 foreach (var property in properties)
                 {
                     var propertyName = property.Name;
-                    var methodName = GetMethodName(property, endian);                   
 
                     if (string.IsNullOrEmpty(propertyName))
                         continue;
 
-                    if (!hasStrings && methodName.Contains("String"))
-                        hasStrings = true;
 
+                    var fieldAttribute = property.GetAttribute<AutoByteStringAttribute>()
+                        ?? property.GetAttribute<AutoByteFieldAttribute>();
 
+                    if (fieldAttribute != null && fieldAttribute.Skip > 0)
+                        codeBuilder.AppendLine($"{" ",12}slide.Skip({fieldAttribute.Skip});");
+                       
+
+                    var methodName = GetMethodName(property, endian, fieldAttribute);
+                                  
                     codeBuilder.AppendLine($"{" ",12}{propertyName} = slide.{methodName};");
                 }
 
+                // Add using Autobyte
                 usingsBuilder.AppendLine("using AutoByte;");
-
-                if (hasStrings)
+                
+                // Add using System.Text if any of the properties is string
+                if (properties.Any(x => x.Type.ToString() == "string"))
                     usingsBuilder.AppendLine("using System.Text;");
 
 
@@ -103,15 +109,11 @@ namespace AutoByte
         }
 
 
-        private string GetMethodName(IPropertySymbol property, string endian)
+        private string GetMethodName(IPropertySymbol property, string endian, AutoByteFieldAttribute fieldAttribute)
         {
-            var fieldAttribute = property.GetAttribute<AutoByteStringAttribute>()
-                ?? property.GetAttribute<AutoByteFieldAttribute>();
 
-            var skip = GetSkipBytes(fieldAttribute);
-
-            string propertyType = property.Type.ToString();
-            string enumType = string.Empty;
+            var propertyType = property.Type.ToString();
+            var enumType = string.Empty;
 
             // For Enum types get underlaying property type
             if (property.Type.TypeKind == TypeKind.Enum)
@@ -122,29 +124,23 @@ namespace AutoByte
 
             string method = propertyType switch
             {
-                "byte" => $"{skip}GetByte{enumType}()",
-                "short" => $"{skip}GetInt16{endian}{enumType}()",
-                "int" => $"{skip}GetInt32{endian}{enumType}()",
-                "long" => $"{skip}GetInt64{endian}{enumType}()",
-                "ushort" => $"{skip}GetUInt16{endian}{enumType}()",
-                "uint" => $"{skip}GetUInt32{endian}{enumType}()",
-                "ulong" => $"{skip}GetUInt64{endian}{enumType}()",
-                "byte[]" => $"{skip}Slide({fieldAttribute.Size}).ToArray()",
-                "string" => GetStringMethodName(property, fieldAttribute, skip), 
+                "byte" => $"GetByte{enumType}()",
+                "short" => $"GetInt16{endian}{enumType}()",
+                "int" => $"GetInt32{endian}{enumType}()",
+                "long" => $"GetInt64{endian}{enumType}()",
+                "ushort" => $"GetUInt16{endian}{enumType}()",
+                "uint" => $"GetUInt32{endian}{enumType}()",
+                "ulong" => $"GetUInt64{endian}{enumType}()",
+                "byte[]" => $"Slide({fieldAttribute.Size}).ToArray()",
+                "string" => GetStringMethodName(property, fieldAttribute), 
                 _ => throw new Exception($"AutoByte code generator does not support {propertyType}."),
             };
 
             return method;
         }
 
-        private string GetSkipBytes(AutoByteFieldAttribute fieldAttribute)
-        {
-            return (fieldAttribute != null && fieldAttribute.Skip > 0)
-                ? $"Skip({fieldAttribute.Skip})."
-                : string.Empty;
-        }
 
-        private string GetStringMethodName(IPropertySymbol property, AutoByteFieldAttribute fieldAttribute, string skip)
+        private string GetStringMethodName(IPropertySymbol property, AutoByteFieldAttribute fieldAttribute)
         {            
             
             if (fieldAttribute is AutoByteStringAttribute stringField)
@@ -153,20 +149,20 @@ namespace AutoByte
                 {
                     return stringField.Encoding switch
                     {
-                        "UTF8" => $"{skip}GetUtf8String({stringField.Size})",
-                        "Unicode" => $"{skip}GetString(Encoding.Unicode, {stringField.Size})",
-                        "BigEndianUnicode" => $"{skip}GetString(Encoding.BigEndianUnicode, {stringField.Size})",
-                        "UTF7" => $"{skip}GetString(Encoding.UTF7, {stringField.Size})",
-                        "UTF32" => $"{skip}GetString(Encoding.UTF32, {stringField.Size})",
+                        "UTF8" => $"GetUtf8String({stringField.Size})",
+                        "Unicode" => $"GetString(Encoding.Unicode, {stringField.Size})",
+                        "BigEndianUnicode" => $"GetString(Encoding.BigEndianUnicode, {stringField.Size})",
+                        "UTF7" => $"GetString(Encoding.UTF7, {stringField.Size})",
+                        "UTF32" => $"GetString(Encoding.UTF32, {stringField.Size})",
                         _ => throw new Exception($"Encoding {stringField.Encoding} given in AutoByteStringAttribute for {property.Name} is not supported.")
                     };
                 }
                 else 
                 {
                     if (stringField.CodePage > 0)
-                        return $"{skip}GetString(Encoding.GetEncoding({stringField.CodePage}), {stringField.Size})";
+                        return $"GetString(Encoding.GetEncoding({stringField.CodePage}), {stringField.Size})";
                     else
-                        return $"{skip}GetUtf8String({stringField.Size})";
+                        return $"GetUtf8String({stringField.Size})";
                 }
             }
 
