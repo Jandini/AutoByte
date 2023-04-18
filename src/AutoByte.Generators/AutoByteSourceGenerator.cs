@@ -69,6 +69,7 @@ namespace AutoByte
                     _ => string.Empty
                 };
 
+                var computedStructureSize = 0;
 
                 foreach (var property in properties)
                 {
@@ -82,12 +83,18 @@ namespace AutoByte
                         ?? property.GetAttribute<AutoByteFieldAttribute>();
 
                     if (fieldAttribute != null && fieldAttribute.Skip > 0)
+                    {
                         codeBuilder.AppendLine($"{" ",12}slide.Skip({fieldAttribute.Skip});");
+                        computedStructureSize += fieldAttribute.Skip;
+                    }
                        
+                    // Get ByteSlide method and field size base on type or given size in the attribute
+                    var methodInfo = GetMethodInfo(property, endian, fieldAttribute);
 
-                    var methodName = GetMethodName(property, endian, fieldAttribute);
-                                  
-                    codeBuilder.AppendLine($"{" ",12}{propertyName} = slide.{methodName};");
+                    // Compute structure size
+                    computedStructureSize += methodInfo.Item2;
+
+                    codeBuilder.AppendLine($"{" ",12}{propertyName} = slide.{methodInfo.Item1};");
                 }
 
                 // Add using Autobyte
@@ -99,7 +106,7 @@ namespace AutoByte
 
 
                 string generatedCode = codeBuilder.ToString().TrimEnd('\r', '\n');
-                var structureSize = autoByteAttribute.Size;
+                var structureSize = autoByteAttribute.Size > 0 ? autoByteAttribute.Size : computedStructureSize;
                 var className = classDeclaration.Identifier.ToString();
                 var namespaceName = classDeclaration.GetNamespace();
 
@@ -109,7 +116,7 @@ namespace AutoByte
         }
 
 
-        private string GetMethodName(IPropertySymbol property, string endian, AutoByteFieldAttribute fieldAttribute)
+        private Tuple<string, int> GetMethodInfo(IPropertySymbol property, string endian, AutoByteFieldAttribute fieldAttribute)
         {
 
             var propertyType = property.Type.ToString();
@@ -136,7 +143,19 @@ namespace AutoByte
                 _ => throw new Exception($"AutoByte code generator does not support {propertyType}."),
             };
 
-            return method;
+            int size = propertyType switch
+            {
+                "byte" => 1,
+                "short" => 2,
+                "ushort" => 2,
+                "int" => 4,
+                "uint" => 4,
+                "long" => 8,
+                "ulong" => 8,
+                _ => fieldAttribute?.Size ?? 0
+            };
+
+            return new Tuple<string, int>(method, size);
         }
 
 
