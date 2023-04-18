@@ -23,22 +23,26 @@ namespace AutoByte
         /// <summary>
         /// Move pointer by "sliding" forward by specified number of bytes.
         /// </summary>
-        /// <param name="length"></param>
+        /// <param name="size"></param>
         /// <returns></returns>
         /// <exception cref="ByteSlideException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<byte> Slide(int length)
+        public ReadOnlySpan<byte> Slide(int size)
         {
-            if (length > _slide.Length)
-                throw new ByteSlideException("Byte slide is too short.");
+            if (size > _slide.Length)
+                throw new ByteSlideException($"Cannot slide {size} byte. There is only {_slide.Length} bytes left.");
 
-            var slice = _slide[..length];
-            _slide = _slide[length..];
+            var slice = _slide[..size];
+            _slide = _slide[size..];
             return slice;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Skip(int size) { 
+        public void Skip(int size) {
+
+            if (size > _slide.Length)
+                throw new ByteSlideException($"Cannot skip {size} bytes. There is only {_slide.Length} bytes left.");
+
             _slide = _slide[size..];            
         }
 

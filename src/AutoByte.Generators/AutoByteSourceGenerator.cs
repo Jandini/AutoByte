@@ -12,7 +12,7 @@ namespace AutoByte
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-#if DEBUG
+#if DEBUG_
             if (!Debugger.IsAttached)
             {
                 Debugger.Launch();
