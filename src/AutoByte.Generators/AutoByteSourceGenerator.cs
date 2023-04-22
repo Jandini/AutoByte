@@ -138,7 +138,7 @@ namespace AutoByte
                 "ushort" => $"GetUInt16{endian}{enumType}()",
                 "uint" => $"GetUInt32{endian}{enumType}()",
                 "ulong" => $"GetUInt64{endian}{enumType}()",
-                "byte[]" => $"Slide({fieldAttribute?.SizePropertyName ?? fieldAttribute.Size.ToString()}).ToArray()",
+                "byte[]" => $"Slide({fieldAttribute?.SizeFromProperty ?? fieldAttribute.Size.ToString()}).ToArray()",
                 "string" => GetStringMethodName(property, fieldAttribute), 
                 _ => throw new Exception($"AutoByte code generator does not support {propertyType}."),
             };
@@ -163,7 +163,7 @@ namespace AutoByte
             
             if (fieldAttribute is AutoByteStringAttribute stringField)
             {
-                var stringFieldSize = fieldAttribute?.SizePropertyName ?? fieldAttribute.Size.ToString();
+                var stringFieldSize = fieldAttribute?.SizeFromProperty ?? fieldAttribute.Size.ToString();
 
                 if (stringField.Encoding != null)
                 {
