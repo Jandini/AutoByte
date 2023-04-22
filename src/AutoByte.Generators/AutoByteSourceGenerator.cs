@@ -169,13 +169,14 @@ namespace AutoByte
 
                 if (stringField.Encoding != null)
                 {
-                    return stringField.Encoding switch
-                    {
-                        "UTF8" => $"GetUtf8String({stringFieldSize})",
-                        "Unicode" => $"GetString(Encoding.Unicode, {stringFieldSize})",
-                        "BigEndianUnicode" => $"GetString(Encoding.BigEndianUnicode, {stringFieldSize})",
-                        "UTF7" => $"GetString(Encoding.UTF7, {stringFieldSize})",
-                        "UTF32" => $"GetString(Encoding.UTF32, {stringFieldSize})",
+                    return stringField.Encoding.ToLower() switch
+                    {                        
+                        "utf8" => $"GetUtf8String({stringFieldSize})",
+                        "ascii" => $"GetString(Encoding.ASCII, {stringFieldSize})",
+                        "unicode" => $"GetString(Encoding.Unicode, {stringFieldSize})",
+                        "bigendianunicode" => $"GetString(Encoding.BigEndianUnicode, {stringFieldSize})",
+                        "utf7" => $"GetString(Encoding.UTF7, {stringFieldSize})",
+                        "utf32" => $"GetString(Encoding.UTF32, {stringFieldSize})",
                         _ => throw new Exception($"Encoding {stringField.Encoding} given in AutoByteStringAttribute for {property.Name} is not supported.")
                     };
                 }
