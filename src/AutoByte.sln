@@ -12,8 +12,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoByte.Tests", "AutoByte.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoByte.Generators", "AutoByte.Generators\AutoByte.Generators.csproj", "{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoByte.Demo", "AutoByte.Demo\AutoByte.Demo.csproj", "{7945E0E4-24B7-4E12-A7A2-D350458F604D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,10 +30,6 @@ Global
 		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7945E0E4-24B7-4E12-A7A2-D350458F604D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7945E0E4-24B7-4E12-A7A2-D350458F604D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7945E0E4-24B7-4E12-A7A2-D350458F604D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7945E0E4-24B7-4E12-A7A2-D350458F604D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
