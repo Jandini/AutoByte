@@ -3,115 +3,42 @@
 [![.NET](https://github.com/Jandini/AutoByte/actions/workflows/build.yml/badge.svg)](https://github.com/Jandini/AutoByte/actions/workflows/build.yml)
 [![NuGet](https://github.com/Jandini/AutoByte/actions/workflows/nuget.yml/badge.svg)](https://github.com/Jandini/AutoByte/actions/workflows/nuget.yml)
 
-.NET data structure deserializer and parser.  AutoByte use `BinaryPrimitives` and `ReadOnlySpan<byte>` byte spans to read the data. 
 
+Fast and easy .NET data structure deserializer and parser. 
 
+* Automatically generate implementation from the class properties.
+
+* Provides `ByteSlide` parser.
+
+* Use `BinaryPrimitives` and `ReadOnlySpan<byte>` to read the data. 
+
+  
 
 ## Quick Start
 
-Here is how to use [AutoByte](https://github.com/Jandini/AutoByte) to parse ZIP file header.  
+A few examples how to use AutoByte. 
 
-* Create partial `ZipFileHeader` class.
-* Decorate the class with `AutoByteStructure` attribute.
-* Decorate `FileName` property with `AutoByteString` attribute.  Use `SizeFromProperty` to set the size to  `FileNameLength` value.
-* Decorate `ExtraField` property with `AutoByteField` attribute. Use `SizeFromProperty` to set the size to `ExtraFieldLength` value. 
+### Zip Header
 
-The class should look like this: 
+The [zip header](https://en.wikipedia.org/wiki/ZIP_(file_format)) is well documented. 
 
-```c#
-[AutoByteStructure]
-public partial class ZipFileHeader
-{
-    public int Signature { get; set; }
-    public short VersionMadeBy { get; set; }
-    public short VersionNeededToExtract { get; set; }
-    public short GeneralPurposeBitFlag { get; set; }
-    public short CompressionMethod { get; set; }
-    public short LastModifiedFileTime { get; set; }
-    public short LastModifiedFileDate { get; set; }
-    public int Crc32 { get; set; }
-    public int CompressedSize { get; set; }
-    public int UncompressedSize { get; set; }
-    public short FileNameLength { get; set; }
-    public short ExtraFieldLength { get; set; }
-    
-    [AutoByteString(SizeFromProperty = "FileNameLength")]
-    public string FileName { get; set; }
-    
-    [AutoByteField(SizeFromProperty = "ExtraFieldLength")]
-    public byte[] ExtraField { get; set; }       
-}
-```
-
-That is all. Now use `ByteSlide` to read the header: 
-
-```c#
-var data = new byte[]
-{
-    0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x00, 0x00, 0x08, 0x00, 0x63, 0x54,
-    0x96, 0x56, 0x45, 0x7F, 0x6A, 0xBD, 0x5B, 0x02, 0x00, 0x00, 0xF4, 0x08,
-    0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x41, 0x75, 0x74, 0x6F, 0x42, 0x79,
-    0x74, 0x65, 0x2E, 0x73, 0x6C, 0x6E
-};
-
-var header = new ByteSlide(data);
-var zip = header.GetStructure<ZipFileHeader>();
-```
-
-
-
-AutoByte's code generator will create the implementation for you:
-
-```c#
-public partial class ZipFileHeader : IByteStructure
-{
-    public static int StructureSize = 32;
-    public int Deserialize(ref ByteSlide slide)
-    {
-        Signature = slide.GetInt32LittleEndian();
-        VersionMadeBy = slide.GetInt16LittleEndian();
-        VersionNeededToExtract = slide.GetInt16LittleEndian();
-        GeneralPurposeBitFlag = slide.GetInt16LittleEndian();
-        CompressionMethod = slide.GetInt16LittleEndian();
-        LastModifiedFileTime = slide.GetInt16LittleEndian();
-        LastModifiedFileDate = slide.GetInt16LittleEndian();
-        Crc32 = slide.GetInt32LittleEndian();
-        CompressedSize = slide.GetInt32LittleEndian();
-        UncompressedSize = slide.GetInt32LittleEndian();
-        FileNameLength = slide.GetInt16LittleEndian();
-        ExtraFieldLength = slide.GetInt16LittleEndian();
-        FileName = slide.GetUtf8String(FileNameLength);
-        ExtraField = slide.Slide(ExtraFieldLength).ToArray();
-        return 32;
-    }
-}
-```
-
-
-
-
-
-### Step by step 
-
-The example use a zip file header created from a single file "AutoByte.sln" file compressed into a zip archive. The [zip header](https://en.wikipedia.org/wiki/ZIP_(file_format)) is well documented. 
-
-| Offset | Bytes | Description                              |
-| ------ | ----- | ---------------------------------------- |
-| 0      | 4     | Local file header signature = 0x04034b50 (PK♥♦ or "PK\3\4") |
-| 4      | 2     | Version needed to extract (minimum)      |
-| 6      | 2     | General purpose bit flag                 |
+| Offset | Bytes | Description                                                  |
+| ------ | ----- | ------------------------------------------------------------ |
+| 0      | 4     | Local file header signature = 0x04034b50 (PK♥♦ or "PK\3\4")  |
+| 4      | 2     | Version needed to extract (minimum)                          |
+| 6      | 2     | General purpose bit flag                                     |
 | 8      | 2     | Compression method; e.g. none = 0, DEFLATE = 8 (or "\0x08\0x00") |
-| 10     | 2     | File last modification time              |
-| 12     | 2     | File last modification date              |
-| 14     | 4     | CRC-32 of uncompressed data              |
-| 18     | 4     | Compressed size (or 0xffffffff for ZIP64) |
-| 22     | 4     | Uncompressed size (or 0xffffffff for ZIP64) |
-| 26     | 2     | File name length (*n*)                   |
-| 28     | 2     | Extra field length (*m*)                 |
-| 30     | *n*   | File name                                |
-| 30+*n* | *m*   | Extra field                              |
+| 10     | 2     | File last modification time                                  |
+| 12     | 2     | File last modification date                                  |
+| 14     | 4     | CRC-32 of uncompressed data                                  |
+| 18     | 4     | Compressed size (or 0xffffffff for ZIP64)                    |
+| 22     | 4     | Uncompressed size (or 0xffffffff for ZIP64)                  |
+| 26     | 2     | File name length (*n*)                                       |
+| 28     | 2     | Extra field length (*m*)                                     |
+| 30     | *n*   | File name                                                    |
+| 30+*n* | *m*   | Extra field                                                  |
 
-The example zip header in the hex editor.
+The zip header in hex editor looks like this.
 
 ```c#
 Offset      0  1  2  3  4  5  6  7   8  9  A  B  C  D  E  F
@@ -133,102 +60,207 @@ var header = new byte[]
 };
 ```
 
+Here is how to use [AutoByte](https://github.com/Jandini/AutoByte) to parse zip file header.  
+
+1. Create a new class.
+
+    ```c#
+    public class ZipFileHeader
+    {    
+    }
+    ```
+
+2. Decorate the class with `AutoByteStructure` and make it `partial` to activate code generator.
+
+    ```c#
+    [AutoByteStructure]
+    public partial class ZipFileHeader
+    {    
+    }
+    ```
+
+3. Add zip header properties based on the documentation. 
+
+    ```c#
+    [AutoByteStructure]
+    public partial class ZipFileHeader
+    {
+        public int Signature { get; set; }
+        public short VersionNeededToExtract { get; set; }
+        public short GeneralPurposeBitFlag { get; set; }
+        public short CompressionMethod { get; set; }
+        public short LastModifiedFileTime { get; set; }
+        public short LastModifiedFileDate { get; set; }
+        public int Crc32 { get; set; }
+        public int CompressedSize { get; set; }
+        public int UncompressedSize { get; set; }
+        public short FileNameLength { get; set; }
+        public short ExtraFieldLength { get; set; }
+        public string FileName { get; set; }
+        public byte[] ExtraField { get; set; }   
+    }
+    ```
 
 
-Create a C# class that represents zip file header based on the documentation.  
 
-> Note that each property type represents byte size of the field; `byte ` is 1 byte,  ` short` is 2 bytes,  `int` is 4 bytes and `long` is 8 bytes. 
+4. Non primitive types like arrays or strings must be decorated with `AutoByteField` or `AutoByteString` attribute.  Use `SizeFromProperty` to get the size from previously parsed properties.
+
+    ```c#
+    [AutoByteStructure]
+    public partial class ZipFileHeader
+    {
+        public int Signature { get; set; }
+        public short VersionNeededToExtract { get; set; }
+        public short GeneralPurposeBitFlag { get; set; }
+        public short CompressionMethod { get; set; }
+        public short LastModifiedFileTime { get; set; }
+        public short LastModifiedFileDate { get; set; }
+        public int Crc32 { get; set; }
+        public int CompressedSize { get; set; }
+        public int UncompressedSize { get; set; }
+        public short FileNameLength { get; set; }
+        public short ExtraFieldLength { get; set; }
+    
+        [AutoByteString(SizeFromProperty = "FileNameLength")]
+        public string FileName { get; set; }    
+    
+        [AutoByteField(SizeFromProperty = "ExtraFieldLength")]
+        public byte[] ExtraField { get; set; }
+    }
+    ```
+
+
+
+5. Get zip header with `ByteSlide` structure.
+
+    ```c#
+    // zip header in byte array
+    var data = new byte[]
+    {
+        0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x00, 0x00, 0x08, 0x00, 0x63, 0x54,
+        0x96, 0x56, 0x45, 0x7F, 0x6A, 0xBD, 0x5B, 0x02, 0x00, 0x00, 0xF4, 0x08,
+        0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x41, 0x75, 0x74, 0x6F, 0x42, 0x79,
+        0x74, 0x65, 0x2E, 0x73, 0x6C, 0x6E
+    };
+    
+    // create byte slide from byte array
+    var header = new ByteSlide(data);
+    
+    // deserialize the zip header structure
+    var zip = header.GetStructure<ZipFileHeader>();
+    ```
+
+
+
+The code generator will create the implementation for you.
 
 ```c#
-public class ZipFileHeader
+public partial class ZipFileHeader : IByteStructure
 {
-    /// <summary>
-    /// Signature for ZIP file header
-    /// </summary>
-    public int Signature { get; set; }
-
-    /// <summary>
-    /// Version of software used to create ZIP file
-    /// </summary>
-    public short VersionMadeBy { get; set; }
-
-    /// <summary>
-    /// Version of software needed to extract ZIP file
-    /// </summary>
-    public short VersionNeededToExtract { get; set; }
-
-    /// <summary>
-    /// General purpose bit flag
-    /// </summary>
-    public short GeneralPurposeBitFlag { get; set; }
-
-    /// <summary>
-    /// Compression method used
-    /// </summary>
-    public short CompressionMethod { get; set; }
-
-    /// <summary>
-    /// Last modified file time
-    /// </summary>
-    public short LastModifiedFileTime { get; set; }
-
-    /// <summary>
-    /// Last modified file date
-    /// </summary>
-    public short LastModifiedFileDate { get; set; }
-
-    /// <summary>
-    /// CRC-32 checksum of file
-    /// </summary>
-    public int Crc32 { get; set; }
-
-    /// <summary>
-    /// Compressed size of file
-    /// </summary>
-    public int CompressedSize { get; set; }
-
-    /// <summary>
-    /// Uncompressed size of file
-    /// </summary>
-    public int UncompressedSize { get; set; }
-
-    /// <summary>
-    /// Length of file name
-    /// </summary>
-    public short FileNameLength { get; set; }
-
-    /// <summary>
-    /// Length of extra field
-    /// </summary>
-    public short ExtraFieldLength { get; set; }
-
-    /// <summary>
-    /// File name
-    /// </summary>
-    public string FileName { get; set; }
-
-    /// <summary>
-    /// Extra field
-    /// </summary>
-    public byte[] ExtraField { get; set; }       
+    public static int StructureSize = 30;
+    public int Deserialize(ref ByteSlide slide)
+    {
+        Signature = slide.GetInt32LittleEndian();
+        VersionNeededToExtract = slide.GetInt16LittleEndian();
+        GeneralPurposeBitFlag = slide.GetInt16LittleEndian();
+        CompressionMethod = slide.GetInt16LittleEndian();
+        LastModifiedFileTime = slide.GetInt16LittleEndian();
+        LastModifiedFileDate = slide.GetInt16LittleEndian();
+        Crc32 = slide.GetInt32LittleEndian();
+        CompressedSize = slide.GetInt32LittleEndian();
+        UncompressedSize = slide.GetInt32LittleEndian();
+        FileNameLength = slide.GetInt16LittleEndian();
+        ExtraFieldLength = slide.GetInt16LittleEndian();
+        FileName = slide.GetUtf8String(FileNameLength);
+        ExtraField = slide.Slide(ExtraFieldLength).ToArray();
+        return 0;
+    }
 }
 ```
 
 
 
-Decorate the class with ` [AutoByteStructure]` attribute and make the class `partial`. The class must be marked as partial because the code generator will create deserialization code in separate file. 
+### Master Boot Record
 
- 
+Following example demonstrate how read [Master Boot Record](https://en.wikipedia.org/wiki/Master_boot_record) with AutoByte. 
+
+1. Create `PartitionType` enum and set the size to 1 `byte`.
+
+    ```c#
+    public enum PartitionType : byte
+    {
+        Empty = 0x00,
+        Fat12 = 0x01,
+        XENIXRoot = 0x02,
+        XENIXUser = 0x03,
+        FAT16 = 0x04,
+        Extended = 0x05,
+        FAT32 = 0x0B,
+        FAT32LBA = 0x0C,
+        Linux = 0x83,
+    }
+    ```
+
+2. Create `PartitionEntry` class.
+
+    ```c#
+    [AutoByteStructure]
+    public partial class PartitionEntry
+    {
+        public byte BootIndicator { get; set; }
+        [AutoByteField(Size = 3)]
+        public byte[] StartingCHS { get; set; }
+        public PartitionType Type { get; set; }
+        [AutoByteField(Size = 3)]
+        public byte[] EndingCHS { get; set; }
+        public uint StartingLBA { get; set; }
+        public uint SizeInLBA { get; set; }
+    }
+    ```
+
+3. Create non-partial `MasterBootRecord` class with `IByteStructure` interface. 
+
+    ```c#
+    public class MasterBootRecord : IByteStructure
+    {
+        public byte[] BootCode { get; private set; }
+        public PartitionEntry[] PartitionEntries { get; private set; }
+        public ushort BootSignature { get; private set; }
+
+        public int Deserialize(ref ByteSlide slide)
+        {
+            // get boot code 
+            BootCode = slide.GetByteArray(446);
+
+            // read all 4 partition entries
+            PartitionEntries = new PartitionEntry[4];
+            for (int i = 0; i < 4; i++)
+                PartitionEntries[i] = slide.GetStructure<PartitionEntry>();
+
+            // read signature (0xAA55)
+            BootSignature = slide.GetUInt16LittleEndian();
+            return 0;
+        }
+    }
+    ```
+
+4. Read the structure with `ByteSlide` structure.
+
+    ```c#
+    // read first sector (512 bytes) from first physical drive (windows only)
+    using var drive = File.OpenRead("//?/PHYSICALDRIVE0");
+    var sector = new byte[512];
+    drive.Read(sector);
+    
+    // create byte slide and read master boot record
+    var slide = new ByteSlide(sector);
+    var mbr = slide.GetStructure<MasterBootRecord>();
+    ```
 
 
 
 
-
-
-
-
-
-### Without code generator
+### UTF8 Text 
 
 The sample data structure consists of two bytes and text with a length stored in the first two bytes.
 
@@ -247,26 +279,63 @@ Offset      0  1  2  3  4  5  6  7   8  9  A  B  C  D  E  F
 
 
 
-Create DTO class for the license object and apply IByteStructure implementation for Deserialize method using ByteSlide:
+1. Create a class for the license object.
 
-```c#
-public class License : IByteStructure
-{
-    public short Length { get; set; }
-    public string Text { get; set; }   
-
-    public int Deserialize(ref ByteSlide slide)
+    ```c#
+    public class License 
     {
-        Length = slide.GetInt16LittleEndian();
-        Text = slide.GetUtf8String(Length);
-        return 0;
     }
-}
-```
+    ```
+
+1. Add `IByteStructure` interface from AutoByte.
+
+    ```c#
+    public class License : IByteStructure
+    {
+        public int Deserialize(ref ByteSlide slide)
+        {
+            return 0;
+        }
+    }
+    ```
+    
+1. Add structure properties. 
+
+    ```c#
+    public class License : IByteStructure
+    {
+        public short Length { get; set; }
+        public string Text { get; set; }   
+    
+        public int Deserialize(ref ByteSlide slide)
+        {
+            return 0;
+        }
+    }
+    ```
+    
+    
+    
+1. Use `ByteSlide` to read data.
+
+    ```c#
+    public class License : IByteStructure
+    {
+        public short Length { get; set; }
+        public string Text { get; set; }   
+    
+        public int Deserialize(ref ByteSlide slide)
+        {
+            Length = slide.GetInt16LittleEndian();
+            Text = slide.GetUtf8String(Length);
+            return 0;
+        }
+    }
+    ```
 
 
 
-Use ByteSlide to deserialize data structure into DTO class:
+The entire test code can look like this. 
 
 ```c#
 [Fact]
@@ -305,5 +374,4 @@ public void Test1()
 ### Resources
 
 Byte icon was downloaded from [Flaticon](https://www.flaticon.com/free-icon/byte_5044438)
-
 
