@@ -1,5 +1,4 @@
-﻿using System;
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -24,23 +23,28 @@ namespace AutoByte
         /// <summary>
         /// Move pointer by "sliding" forward by specified number of bytes.
         /// </summary>
-        /// <param name="length"></param>
+        /// <param name="size"></param>
         /// <returns></returns>
         /// <exception cref="ByteSlideException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ReadOnlySpan<byte> Slide(int length)
+        public ReadOnlySpan<byte> Slide(int size)
         {
-            if (length > _slide.Length)
-                throw new ByteSlideException("Byte slide is too short.");
+            if (size > _slide.Length)
+                throw new ByteSlideException($"Cannot slide {size} bytes. There is {_slide.Length} bytes left.");
 
-            var slice = _slide[..length];
-            _slide = _slide[length..];
+            var slice = _slide[..size];
+            _slide = _slide[size..];
             return slice;
         }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Skip(int length) => _slide = _slide[length..];
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Skip(int size) {
+
+            if (size > _slide.Length)
+                throw new ByteSlideException($"Cannot skip {size} bytes. There is {_slide.Length} bytes left.");
+
+            _slide = _slide[size..];            
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte GetByte() => Slide(sizeof(byte))[0];
@@ -133,14 +137,14 @@ namespace AutoByte
         public string GetString(Encoding encoding, int length) => encoding.GetString(Slide(length));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string GetUtf8String(int length) => Encoding.UTF8.GetString(Slide(length));
+        public string GetUtf8String(int size) => Encoding.UTF8.GetString(Slide(size));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string GetUnicodeString(int length) => Encoding.Unicode.GetString(Slide(length));
+        public string GetUnicodeString(int size) => Encoding.Unicode.GetString(Slide(size));
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte[] GetArray(int length) => Slide(length).ToArray();
+        public byte[] GetByteArray(int length) => Slide(length).ToArray();
 
         
         /// <summary>
@@ -150,7 +154,7 @@ namespace AutoByte
         /// <param name="align">Align to given number of bytes</param>
         /// <returns>An array with given length</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte[] GetArrayAlignTo(int length, int align)
+        public byte[] GetByteArrayAlignTo(int length, int align)
         {
             var result = Slide(length).ToArray();
             
@@ -178,8 +182,18 @@ namespace AutoByte
             var size = structure.Deserialize(ref this);
 
             // if the expected structure size was provided then check if more slide is required 
-            if (size > 0 && (more = (start - _slide.Length) % size) > 0)
-                _slide = _slide[more..];
+            if (size > 0)
+            {
+                more = (start - _slide.Length) % size;
+
+                if (more > 0)
+                {
+                    if (more > _slide.Length)
+                        throw new ByteSlideException($"The structure size ({size} bytes) is too big. There is {_slide.Length} bytes left.");
+
+                    _slide = _slide[more..];
+                }
+            }
 
             return structure;
         }

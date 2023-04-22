@@ -1,24 +1,12 @@
-using AutoByte;
+using AutoByte.Tests.Structures;
 
-namespace AutByte.Tests
+namespace AutoByte.Tests
 {
+
     public class ByteStructure_Must
     {
-        public class LicenseText : IByteStructure
-        {
-            public short Length { get; set; }
-            public string Text { get; set; }
-
-            public int Deserialize(ref ByteSlide slide)
-            {
-                Length = slide.GetInt16LittleEndian();
-                Text = slide.GetUtf8String(Length);
-                return 0;
-            }
-        }
-
         [Fact]
-        public void Deserialize_Text()
+        public void DeserializeText()
         {
             var data = new byte[] {
 

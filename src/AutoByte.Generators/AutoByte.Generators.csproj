@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<BaseOutputPath>..\..\bin</BaseOutputPath>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+		<IsPackable>false</IsPackable>
+		<LangVersion>10</LangVersion>
+		<IncludeBuildOutput>true</IncludeBuildOutput>	
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Authors>Matt Janda</Authors>
+		<RootNamespace>AutoByte</RootNamespace>
+		<Description>Source code generator for AutoByte</Description>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Include="..\AutoByte\AutoByteFieldAttribute.cs" Link="AutoByteFieldAttribute.cs" />
+	  <Compile Include="..\AutoByte\AutoByteStringAttribute.cs" Link="AutoByteStringAttribute.cs" />
+	  <Compile Include="..\AutoByte\AutoByteStructureAttribute.cs" Link="AutoByteStructureAttribute.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+    		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+      			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      			<PrivateAssets>all</PrivateAssets>
+    		</PackageReference>
+    		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
+	</ItemGroup>
+</Project>

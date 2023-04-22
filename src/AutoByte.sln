@@ -4,8 +4,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoByte", "AutoByte\AutoByte.csproj", "{F1B14AC4-B34A-498A-AE99-713D3485F950}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390} = {D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoByte.Tests", "AutoByte.Tests\AutoByte.Tests.csproj", "{C62D95C9-03FA-4835-95F0-2FA12029BC0F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoByte.Generators", "AutoByte.Generators\AutoByte.Generators.csproj", "{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +26,10 @@ Global
 		{C62D95C9-03FA-4835-95F0-2FA12029BC0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C62D95C9-03FA-4835-95F0-2FA12029BC0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C62D95C9-03FA-4835-95F0-2FA12029BC0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3BCAEAB-9CE3-439E-A78B-D4D0B3C2D390}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

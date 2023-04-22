@@ -1,6 +1,6 @@
 ﻿namespace AutoByte
 {
-    public interface IByteStructure
+    public partial interface IByteStructure
     {
         /// <summary>
         /// Deserialize bytes using byte slide.
