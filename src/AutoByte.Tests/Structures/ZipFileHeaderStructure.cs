@@ -1,73 +1,70 @@
-﻿namespace AutoByte.Tests.Structures
+﻿using System.Runtime.InteropServices;
+
+namespace AutoByte.Tests.Structures
 {
-    [AutoByteStructure]
-    public partial class ZipFileHeader
+    
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct ZipFileHeaderStructure
     {
         /// <summary>
         /// Signature for ZIP file header
         /// </summary>
-        public int Signature { get; set; }
+        public int Signature;
 
         /// <summary>
         /// Version of software needed to extract ZIP file
         /// </summary>
-        public short VersionNeededToExtract { get; set; }
+        public short VersionNeededToExtract;
 
         /// <summary>
         /// General purpose bit flag
         /// </summary>
-        public short GeneralPurposeBitFlag { get; set; }
+        public short GeneralPurposeBitFlag;
 
         /// <summary>
         /// Compression method used
         /// </summary>
-        public short CompressionMethod { get; set; }
+        public short CompressionMethod;
 
         /// <summary>
         /// Last modified file time
         /// </summary>
-        public short LastModifiedFileTime { get; set; }
+        public short LastModifiedFileTime;
 
         /// <summary>
         /// Last modified file date
         /// </summary>
-        public short LastModifiedFileDate { get; set; }
+        public short LastModifiedFileDate;
 
         /// <summary>
         /// CRC-32 checksum of file
         /// </summary>
-        public int Crc32 { get; set; }
+        public int Crc32;
 
         /// <summary>
         /// Compressed size of file
         /// </summary>
-        public int CompressedSize { get; set; }
+        public int CompressedSize;
 
         /// <summary>
         /// Uncompressed size of file
         /// </summary>
-        public int UncompressedSize { get; set; }
+        public int UncompressedSize;
 
         /// <summary>
         /// Length of file name
         /// </summary>
-        public short FileNameLength { get; set; }
+        public short FileNameLength;
 
         /// <summary>
         /// Length of extra field
         /// </summary>
-        public short ExtraFieldLength { get; set; }
+        public short ExtraFieldLength;
 
         /// <summary>
         /// File name
         /// </summary>
-        [AutoByteString(SizeFromProperty = "FileNameLength")]
-        public string FileName { get; set; }
-
-        /// <summary>
-        /// Extra field
-        /// </summary>
-        [AutoByteField(SizeFromProperty = "ExtraFieldLength")]
-        public byte[] ExtraField { get; set; }
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12)]
+        public byte[] FileName;
     }
 }
