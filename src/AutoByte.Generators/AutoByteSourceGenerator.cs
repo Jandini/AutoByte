@@ -106,7 +106,9 @@ namespace AutoByte
 
 
                 string generatedCode = codeBuilder.ToString().TrimEnd('\r', '\n');
-                var structureSize = autoByteAttribute.Size > 0 ? autoByteAttribute.Size : computedStructureSize;
+
+                // Do not return computed size due to SizeFromProperty.
+                var structureSize = autoByteAttribute.Size > 0 ? autoByteAttribute.Size : 0;
                 var className = classDeclaration.Identifier.ToString();
                 var namespaceName = classDeclaration.GetNamespace();
 
