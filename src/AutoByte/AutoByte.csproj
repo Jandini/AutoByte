@@ -7,7 +7,7 @@
     <PackageId>AutoByte</PackageId>
     <AssemblyName>AutoByte</AssemblyName>
     <RootNamespace>AutoByte</RootNamespace>
-    <Description>Data strucure deserializer</Description>
+    <Description>Fast .NET data strucure deserializer and parser</Description>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>		
     <PackageTags>autobyte byteslide data structure deserializer</PackageTags>
