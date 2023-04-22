@@ -30,7 +30,7 @@ namespace AutoByte
         public ReadOnlySpan<byte> Slide(int size)
         {
             if (size > _slide.Length)
-                throw new ByteSlideException($"Cannot slide {size} byte. There is only {_slide.Length} bytes left.");
+                throw new ByteSlideException($"Cannot slide {size} bytes. There is {_slide.Length} bytes left.");
 
             var slice = _slide[..size];
             _slide = _slide[size..];
@@ -41,7 +41,7 @@ namespace AutoByte
         public void Skip(int size) {
 
             if (size > _slide.Length)
-                throw new ByteSlideException($"Cannot skip {size} bytes. There is only {_slide.Length} bytes left.");
+                throw new ByteSlideException($"Cannot skip {size} bytes. There is {_slide.Length} bytes left.");
 
             _slide = _slide[size..];            
         }
@@ -182,8 +182,18 @@ namespace AutoByte
             var size = structure.Deserialize(ref this);
 
             // if the expected structure size was provided then check if more slide is required 
-            if (size > 0 && (more = (start - _slide.Length) % size) > 0)
-                _slide = _slide[more..];
+            if (size > 0)
+            {
+                more = (start - _slide.Length) % size;
+
+                if (more > 0)
+                {
+                    if (more > _slide.Length)
+                        throw new ByteSlideException($"The structure size ({size} bytes) is too big. There is {_slide.Length} bytes left.");
+
+                    _slide = _slide[more..];
+                }
+            }
 
             return structure;
         }
