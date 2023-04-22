@@ -4,7 +4,7 @@ namespace AutoByte.Tests
 {
 
     public class ByteStructure_Must
-    {        
+    {
         [Fact]
         public void DeserializeText()
         {
@@ -29,6 +29,6 @@ namespace AutoByte.Tests
             Assert.Equal(EXPECTED_LENGTH, license.Length);
             Assert.Equal(EXPECTED_TEXT, license.Text);
             Assert.Equal(EXPECTED_LENGTH, license.Text.Length);
-        }       
+        }
     }
 }

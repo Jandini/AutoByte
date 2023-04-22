@@ -1,15 +1,30 @@
 using AutoByte.Tests.Structures;
-using System.ComponentModel;
 
 namespace AutoByte.Tests
 {
 
     public class CodeGenerator_Must
     {
-          
-    
+
         [Fact]
-        public void GenerateCode_DeserializeMBR()
+        public void GenerateCode_DeserializeZipFileHeader()
+        {
+var data = new byte[]
+{
+    0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x00, 0x00, 0x08, 0x00, 0x63, 0x54,
+    0x96, 0x56, 0x45, 0x7F, 0x6A, 0xBD, 0x5B, 0x02, 0x00, 0x00, 0xF4, 0x08,
+    0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x41, 0x75, 0x74, 0x6F, 0x42, 0x79,
+    0x74, 0x65, 0x2E, 0x73, 0x6C, 0x6E
+};
+
+var header = new ByteSlide(data);
+var zip = header.GetStructure<ZipFileHeader>();
+
+
+        }
+
+        [Fact]
+        public void GenerateCode_DeserializeMasterBootRecord()
         {
             var sector = new byte[] {
                 0xEB, 0x63, 0x90, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -48,19 +63,15 @@ namespace AutoByte.Tests
 
 
             var slide = new ByteSlide(sector);
-
             var mbr = slide.GetStructure<MasterBootRecord>();
 
             const int EXPECTED_BOOT_SIGNATURE = 0xAA55;
-                        
-            Assert.Equal(EXPECTED_BOOT_SIGNATURE, mbr.BootSignature);
-
             const PartitionType EXPECTED_PARTITION_0_TYPE = PartitionType.FAT32LBA;
             const byte EXPECTED_PARTITION_0_BOOT_INDICATOR = 0x80;
 
+            Assert.Equal(EXPECTED_BOOT_SIGNATURE, mbr.BootSignature);
             Assert.Equal(EXPECTED_PARTITION_0_TYPE, mbr.PartitionEntries[0].Type);
             Assert.Equal(EXPECTED_PARTITION_0_BOOT_INDICATOR, mbr.PartitionEntries[0].BootIndicator);
         }
-
     }
 }
