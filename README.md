@@ -4,7 +4,7 @@
 [![NuGet](https://github.com/Jandini/AutoByte/actions/workflows/nuget.yml/badge.svg)](https://github.com/Jandini/AutoByte/actions/workflows/nuget.yml)
 
 
-Fast and easy .NET data structure deserializer and parser. 
+Fast .NET data structure deserializer and parser. 
 
 * Automatically generate implementation from the class properties.
 
