@@ -12,7 +12,7 @@ namespace AutoByte
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-#if DEBUG_
+#if DEBUG
             if (!Debugger.IsAttached)
             {
                 Debugger.Launch();
@@ -138,7 +138,7 @@ namespace AutoByte
                 "ushort" => $"GetUInt16{endian}{enumType}()",
                 "uint" => $"GetUInt32{endian}{enumType}()",
                 "ulong" => $"GetUInt64{endian}{enumType}()",
-                "byte[]" => $"Slide({fieldAttribute.Size}).ToArray()",
+                "byte[]" => $"Slide({fieldAttribute?.SizePropertyName ?? fieldAttribute.Size.ToString()}).ToArray()",
                 "string" => GetStringMethodName(property, fieldAttribute), 
                 _ => throw new Exception($"AutoByte code generator does not support {propertyType}."),
             };
@@ -158,30 +158,31 @@ namespace AutoByte
             return new Tuple<string, int>(method, size);
         }
 
-
         private string GetStringMethodName(IPropertySymbol property, AutoByteFieldAttribute fieldAttribute)
         {            
             
             if (fieldAttribute is AutoByteStringAttribute stringField)
             {
+                var stringFieldSize = fieldAttribute?.SizePropertyName ?? fieldAttribute.Size.ToString();
+
                 if (stringField.Encoding != null)
                 {
                     return stringField.Encoding switch
                     {
-                        "UTF8" => $"GetUtf8String({stringField.Size})",
-                        "Unicode" => $"GetString(Encoding.Unicode, {stringField.Size})",
-                        "BigEndianUnicode" => $"GetString(Encoding.BigEndianUnicode, {stringField.Size})",
-                        "UTF7" => $"GetString(Encoding.UTF7, {stringField.Size})",
-                        "UTF32" => $"GetString(Encoding.UTF32, {stringField.Size})",
+                        "UTF8" => $"GetUtf8String({stringFieldSize})",
+                        "Unicode" => $"GetString(Encoding.Unicode, {stringFieldSize})",
+                        "BigEndianUnicode" => $"GetString(Encoding.BigEndianUnicode, {stringFieldSize})",
+                        "UTF7" => $"GetString(Encoding.UTF7, {stringFieldSize})",
+                        "UTF32" => $"GetString(Encoding.UTF32, {stringFieldSize})",
                         _ => throw new Exception($"Encoding {stringField.Encoding} given in AutoByteStringAttribute for {property.Name} is not supported.")
                     };
                 }
                 else 
                 {
                     if (stringField.CodePage > 0)
-                        return $"GetString(Encoding.GetEncoding({stringField.CodePage}), {stringField.Size})";
+                        return $"GetString(Encoding.GetEncoding({stringField.CodePage}), {stringFieldSize})";
                     else
-                        return $"GetUtf8String({stringField.Size})";
+                        return $"GetUtf8String({stringFieldSize})";
                 }
             }
 
