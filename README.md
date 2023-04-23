@@ -157,7 +157,6 @@ The code generator will create the implementation for you.
 ```c#
 public partial class ZipFileHeader : IByteStructure
 {
-    public static int StructureSize = 30;
     public int Deserialize(ref ByteSlide slide)
     {
         Signature = slide.GetInt32LittleEndian();
