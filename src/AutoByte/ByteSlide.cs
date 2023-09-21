@@ -6,6 +6,7 @@ namespace AutoByte
 {
     public ref struct ByteSlide
     {
+
         private ReadOnlySpan<byte> _slide;
 
         public ByteSlide(byte[] buffer)
@@ -146,7 +147,25 @@ namespace AutoByte
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] GetByteArray(int length) => Slide(length).ToArray();
 
+
+
+        private static readonly DateTime _cDateUtcEpoch = new(621355968000000000, DateTimeKind.Utc);
+        private static readonly DateTime _hfsDateUtcEpoch = new(600527520000000000, DateTimeKind.Utc);
+
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public DateTime GetCDateUtcLittleEndian() => _cDateUtcEpoch.AddSeconds(BinaryPrimitives.ReadUInt32LittleEndian(Slide(sizeof(uint))));
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public DateTime GetCDateUtcBigEndian() => _cDateUtcEpoch.AddSeconds(BinaryPrimitives.ReadUInt32BigEndian(Slide(sizeof(uint))));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public DateTime GetHfsDateUtcLittleEndian() => _hfsDateUtcEpoch.AddSeconds(BinaryPrimitives.ReadUInt32LittleEndian(Slide(sizeof(uint))));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public DateTime GetHfsDateUtcBigEndian() => _hfsDateUtcEpoch.AddSeconds(BinaryPrimitives.ReadUInt32BigEndian(Slide(sizeof(uint))));
+
+
         /// <summary>
         /// Get byte array from current pointer and align the pointer to given value.
         /// </summary>
