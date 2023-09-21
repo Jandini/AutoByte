@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AutoByte
+﻿namespace AutoByte
 {
     public static class ByteExtensions
     {
