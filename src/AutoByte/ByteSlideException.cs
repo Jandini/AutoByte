@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace AutoByte
+﻿namespace AutoByte
 {
-    internal class ByteSlideException : Exception
+    public class ByteSlideException : Exception
     {
         public ByteSlideException(string message) 
             : base(message)

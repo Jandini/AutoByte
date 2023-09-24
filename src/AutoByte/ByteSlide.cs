@@ -1,4 +1,5 @@
-﻿using System.Buffers.Binary;
+﻿using System;
+using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -19,7 +20,7 @@ namespace AutoByte
             _slide = span;
         }
 
-        public int Length { get => _slide.Length; }
+        public readonly int Length { get => _slide.Length; }
 
         /// <summary>
         /// Move pointer by "sliding" forward by specified number of bytes.
@@ -149,35 +150,129 @@ namespace AutoByte
 
 
 
+
+        /// <summary>
+        /// Represents the UTC epoch date for CDate values.
+        /// This epoch is used as a reference point for interpreting CDate values.
+        /// </summary>
         private static readonly DateTime _cDateUtcEpoch = new(621355968000000000, DateTimeKind.Utc);
+
+        /// <summary>
+        /// Represents the UTC epoch date for HFSDate values.
+        /// This epoch is used as a reference point for interpreting HFSDate values.
+        /// </summary>
         private static readonly DateTime _hfsDateUtcEpoch = new(600527520000000000, DateTimeKind.Utc);
 
-        
+
+        /// <summary>
+        /// Retrieves a DateTime value in UTC by interpreting the next 4 bytes in little-endian format as seconds since the CDate UTC epoch.
+        /// </summary>
+        /// <returns>A DateTime value in UTC.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DateTime GetCDateUtcLittleEndian() => _cDateUtcEpoch.AddSeconds(BinaryPrimitives.ReadUInt32LittleEndian(Slide(sizeof(uint))));
-        
+
+        /// <summary>
+        /// Retrieves a DateTime value in UTC by interpreting the next 4 bytes in big-endian format as seconds since the CDate UTC epoch.
+        /// </summary>
+        /// <returns>A DateTime value in UTC.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DateTime GetCDateUtcBigEndian() => _cDateUtcEpoch.AddSeconds(BinaryPrimitives.ReadUInt32BigEndian(Slide(sizeof(uint))));
 
+        /// <summary>
+        /// Retrieves a DateTime value in UTC by interpreting the next 4 bytes in little-endian format as seconds since the HFSDate UTC epoch.
+        /// </summary>
+        /// <returns>A DateTime value in UTC.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DateTime GetHfsDateUtcLittleEndian() => _hfsDateUtcEpoch.AddSeconds(BinaryPrimitives.ReadUInt32LittleEndian(Slide(sizeof(uint))));
 
+        /// <summary>
+        /// Retrieves a DateTime value in UTC by interpreting the next 4 bytes in big-endian format as seconds since the HFSDate UTC epoch.
+        /// </summary>
+        /// <returns>A DateTime value in UTC.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DateTime GetHfsDateUtcBigEndian() => _hfsDateUtcEpoch.AddSeconds(BinaryPrimitives.ReadUInt32BigEndian(Slide(sizeof(uint))));
 
 
+
         /// <summary>
-        /// Get byte array from current pointer and align the pointer to given value.
+        /// Retrieves a null-terminated C string from the ByteSlide, decoding it using the specified encoding.
         /// </summary>
-        /// <param name="length">Array length</param>
-        /// <param name="align">Align to given number of bytes</param>
-        /// <returns>An array with given length</returns>
+        /// <param name="encoding">The character encoding to use for decoding the C string.</param>
+        /// <returns>The decoded C string.</returns>
+        /// <exception cref="ByteSlideException">Thrown if the C string is not properly terminated with a null character.</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string GetCString(Encoding encoding)
+        {
+            // Find the index of the first zero byte (null terminator) in the _slide Span<byte>.
+            var zeroIndex = _slide.IndexOf((byte)0);
+
+            if (zeroIndex != -1)
+            {
+                // Extract the portion of _slide representing the C string.
+                var stringBytes = Slide(zeroIndex);
+
+                // Skip the null terminator.
+                Skip(1);
+
+                // Decode the C string to a string using the specified encoding and return it.
+                return encoding.GetString(stringBytes);
+            }
+
+            // If no null terminator was found, throw an exception indicating an unterminated C string.
+            throw new ByteSlideException("Unterminated C string.");
+        }
+
+
+
+        /// <summary>
+        /// Retrieves a null-terminated C string from the ByteSlide, decoding it using the specified encoding.
+        /// </summary>
+        /// <param name="encoding">The character encoding to use for decoding the C string.</param>
+        /// <param name="maxLength">The maximum length of the C string to retrieve.</param>
+        /// <returns>The decoded C string, which may be truncated if it exceeds the specified maximum length.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string GetCString(Encoding encoding, int maxLength)
+        {
+            // Find the index of the first zero byte (null terminator) in the _slide Span<byte>.
+            var zeroIndex = _slide.IndexOf((byte)0);
+
+            if (zeroIndex != -1 && (zeroIndex - 1) <= maxLength)
+            {
+                // Extract the portion of _slide representing the C string.
+
+                var stringBytes = Slide(zeroIndex);
+
+                // Skip the null terminator.
+
+                Skip(1);
+
+                // Decode the C string to a string using the specified encoding and return it.
+                return encoding.GetString(stringBytes);
+            }
+
+            // If no null terminator was found or if the string exceeds maxLength, retrieve a string of maximum length.
+
+            return encoding.GetString(Slide(maxLength));
+        }
+
+
+
+        /// <summary>
+        /// Retrieves a byte array from the current pointer position and aligns the pointer to the specified value.
+        /// </summary>
+        /// <param name="length">The length of the byte array to retrieve.</param>
+        /// <param name="align">The number of bytes to align the pointer to after retrieving the array.</param>
+        /// <returns>An array of bytes with the specified length.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] GetByteArrayAlignTo(int length, int align)
         {
+            // Retrieve a byte array of the specified length from the current pointer position.
             var result = Slide(length).ToArray();
-            
+
+            // Calculate the alignment difference.
             var alignment = length % align;
+
+            // If there is an alignment difference, move the pointer forward by the difference.
             if (alignment > 0)
                 _slide = _slide[alignment..];
 
@@ -185,31 +280,37 @@ namespace AutoByte
         }
 
 
-
+        /// <summary>
+        /// Deserializes and retrieves a structure of type T from the current slide, ensuring proper alignment and handling of structure size.
+        /// </summary>
+        /// <typeparam name="T">The type of the structure to retrieve, which must implement the IByteStructure interface and have a default constructor.</typeparam>
+        /// <returns>An instance of the specified structure type, deserialized from the current slide.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T GetStructure<T>() where T : IByteStructure, new()
         {
             int more;
 
-            // create new object to represent the structure
+            // Create a new object to represent the structure.
             var structure = new T();
 
-            // get current slide location 
+            // Get the current slide location.
             var start = _slide.Length;
 
-            // map the structure to the object and get the expected size
+            // Map the structure to the object and get the expected size.
             var size = structure.Deserialize(ref this);
 
-            // if the expected structure size was provided then check if more slide is required 
+            // If the expected structure size was provided, then check if more slide is required.
             if (size > 0)
             {
                 more = (start - _slide.Length) % size;
 
+                // If there are remaining bytes, ensure they are sufficient for the structure size.
                 if (more > 0)
                 {
                     if (more > _slide.Length)
                         throw new ByteSlideException($"The structure size ({size} bytes) is too big. There is {_slide.Length} bytes left.");
 
+                    // Adjust the slide to skip past any remaining bytes.
                     _slide = _slide[more..];
                 }
             }
