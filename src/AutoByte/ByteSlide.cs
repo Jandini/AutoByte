@@ -1,5 +1,4 @@
-﻿using System;
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -254,6 +253,9 @@ namespace AutoByte
 
             return encoding.GetString(Slide(maxLength));
         }
+
+
+        public string GetPascalString(Encoding encoding) => encoding.GetString(Slide(GetByte()));
 
 
 
