@@ -2,6 +2,8 @@
 
 [![.NET](https://github.com/Jandini/AutoByte/actions/workflows/build.yml/badge.svg)](https://github.com/Jandini/AutoByte/actions/workflows/build.yml)
 [![NuGet](https://github.com/Jandini/AutoByte/actions/workflows/nuget.yml/badge.svg)](https://github.com/Jandini/AutoByte/actions/workflows/nuget.yml)
+[![NuGet Version](https://img.shields.io/nuget/v/AutoByte?style=flat&label=Version)](https://www.nuget.org/packages/AutoByte/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/AutoByte.svg?style=flat&label=Downloads)](https://www.nuget.org/packages/AutoByte)
 
 
 Fast .NET data structure deserializer and parser. 
