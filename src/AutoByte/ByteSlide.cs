@@ -258,6 +258,32 @@ namespace AutoByte
         public string GetPascalString(Encoding encoding) => encoding.GetString(Slide(GetByte()));
 
 
+        public string GetPascalString(Encoding encoding, int maxLength)
+        {
+            var length = GetByte();
+
+            if (length == 0)
+            {
+                return string.Empty;
+            }
+
+            // Enforce maxLength (byte-based)
+            var effectiveLength = Math.Min(length, maxLength);
+
+            // Read only what we're allowed to decode
+            var bytes = Slide(effectiveLength);
+
+            // Skip remaining bytes if original length was larger
+            if (length > effectiveLength)
+            {
+                Slide(length - effectiveLength);
+            }
+
+            return encoding.GetString(bytes);
+        }
+
+
+
 
         /// <summary>
         /// Retrieves a byte array from the current pointer position and aligns the pointer to the specified value.
