@@ -34,7 +34,7 @@ jobs:
         source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
 
     - name: Pack
-      run: dotnet pack -c:Release
+      run: dotnet pack -c:Release -o nuget
 
     - name: Test
       run: dotnet test
