@@ -58,22 +58,88 @@ public T PeekStructure<T>() where T : IByteStructure, new()
 }
 ```
 
-**Problem:** 
-- "Peek" implies non-destructive read (doesn't advance pointer)
-- This implementation advances the pointer because it passes `ref this` to `Deserialize`
-- Method name contradicts behavior, causing subtle bugs
+**The Root Cause: How `ref` Works with Structs**
+
+In C#, structs are value types. When passed normally, they're copied:
+```csharp
+public void ModifyStructCopy(ByteSlide slide)
+{
+    slide._slide = slide._slide[4..];  // Modifies COPY only, original unchanged
+}
+```
+
+But with `ref`, the original is modified:
+```csharp
+public void ModifyStructRef(ref ByteSlide slide)
+{
+    slide._slide = slide._slide[4..];  // Modifies ORIGINAL via reference
+}
+```
+
+The `PeekStructure` bug passes `ref this` to `Deserialize()`, which then modifies the **original** ByteSlide's internal state.
+
+**Real-World Impact Example**
+
+Developer's code:
+```csharp
+var slide = new ByteSlide(data);
+
+// Look ahead without consuming bytes
+var peeked = slide.PeekStructure<ZipFileHeader>();
+Console.WriteLine($"Signature: {peeked.Signature}");
+
+// Now read the actual structure (should read same bytes)
+var actual = slide.GetStructure<ZipFileHeader>();
+Console.WriteLine($"Actual Signature: {actual.Signature}");
+
+// Developer expects these to be identical
+Assert.Equal(peeked.Signature, actual.Signature);  // ⚠️ FAILS!
+```
+
+What happens:
+1. `PeekStructure()` calls `Deserialize(ref this)`
+2. Inside Deserialize: `slide.GetInt32LittleEndian()` advances the pointer by 4 bytes
+3. `PeekStructure()` returns, but **the original ByteSlide pointer has been advanced**
+4. `GetStructure()` now reads from DIFFERENT bytes (4 bytes ahead)
+5. Signature values don't match → **silent data corruption**
+
+**Silent Nature of Bug**
+
+No exceptions are thrown. The developer might see:
+- ZIP headers parsing fine initially
+- Suddenly getting garbage data from file entries
+- Spending hours debugging "parsing logic" when it's really method behavior
+- Testing might pass if peek/get are never used together on same data
+
+**Violates Standard Semantics**
+
+All standard data structures define peek as non-destructive:
+```csharp
+var stack = new Stack<int> { 1, 2, 3 };
+int peeked = stack.Peek();      // Returns 3, stack unchanged
+int popped = stack.Pop();       // Returns 3, same value!
+
+var queue = new Queue<int> { 1, 2, 3 };
+int peeked = queue.Peek();      // Returns 1, queue unchanged
+int dequeued = queue.Dequeue(); // Returns 1, same value!
+```
 
 **Recommendation:**
 ```csharp
 public T PeekStructure<T>() where T : IByteStructure, new()
 {
-    var savedSlide = this;  // Save current state
+    var savedSlide = this;              // 1. Save original state
+    
     var structure = new T();
-    structure.Deserialize(ref this);
-    this = savedSlide;      // Restore state
-    return structure;
+    structure.Deserialize(ref this);    // 2. Deserialize (modifies this._slide)
+    
+    this = savedSlide;                  // 3. Restore original state
+    
+    return structure;                   // 4. Return structure, pointer unchanged
 }
 ```
+
+Now both calls read from the same position and return identical values.
 
 ---
 
