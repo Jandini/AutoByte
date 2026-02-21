@@ -409,27 +409,7 @@ public T GetByte<T>() where T : struct
 
 ## What's Overengineered 🏗️
 
-### 1. **DateTime Helper Methods Might Be Premature**
-
-**Location:** [ByteSlide.cs](ByteSlide.cs#L195-L236)
-
-- `GetCDateUtcLittleEndian()`, `GetHfsDateUtcBigEndian()`, etc.
-- These are very specific (Mac HFS, Classic Mac OS timestamps)
-- Only 2-3 real-world use cases
-- Adds complexity to API surface
-
-**Recommendation:** Move to extension methods in separate package:
-```csharp
-// In AutoByte.DateTimeSupport package
-public static DateTime GetMacHfsDateUtc(ref ByteSlide slide)
-    => _hfsEpoch.AddSeconds(slide.GetUInt32LittleEndian());
-```
-
-Keep core library focused.
-
----
-
-### 2. **`AlignTo()` Method Seems Unused**
+### 1. **`AlignTo()` Method Seems Unused**
 
 **Location:** [ByteSlide.cs](ByteSlide.cs#L333-L343)
 
@@ -451,7 +431,7 @@ public void AlignTo(int size, int align)
 
 ---
 
-### 3. **Generic Overloads for Every Type**
+### 2. **Generic Overloads for Every Type**
 
 **Location:** [ByteSlide.cs](ByteSlide.cs#L68, 73, 79, etc.)
 
@@ -469,7 +449,7 @@ public T GetInt16LittleEndian<T>() => ...  // When would you use this?
 
 ---
 
-### 4. **Multiple String Encodings via Attributes**
+### 3. **Multiple String Encodings via Attributes**
 
 **Location:** [AutoByteStringAttribute.cs](AutoByteStringAttribute.cs)
 
