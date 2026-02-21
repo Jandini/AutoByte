@@ -5,14 +5,15 @@
 [![NuGet Version](https://img.shields.io/nuget/v/AutoByte?style=flat&label=Version)](https://www.nuget.org/packages/AutoByte/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/AutoByte.svg?style=flat&label=Downloads)](https://www.nuget.org/packages/AutoByte)
 
+Fast .NET data structure deserializer and parser for parsing binary data formats.
 
-Fast .NET data structure deserializer and parser. 
+* Automatically generate deserialization implementation from class properties using C# source generators.
 
-* Automatically generate implementation from the class properties.
+* Provides `ByteSlide` utility for safe byte-by-byte parsing with position tracking.
 
-* Provides `ByteSlide` parser.
+* Uses `BinaryPrimitives` and `ReadOnlySpan<byte>` for efficient, zero-allocation reading.
 
-* Use `BinaryPrimitives` and `ReadOnlySpan<byte>` to read the data. 
+* Supports parsing of arbitrary binary protocols and file formats (ZIP headers, Master Boot Records, custom binary structures, etc.). 
 
   
 
@@ -372,7 +373,83 @@ public void Test1()
 
 
 
-### Resources
+## Installation
+
+Install the NuGet package:
+
+```bash
+dotnet add package AutoByte
+```
+
+Or via Package Manager Console:
+
+```powershell
+Install-Package AutoByte
+```
+
+## Key Features
+
+### Source Generators
+AutoByte uses C# 10 source generators to automatically generate the `Deserialize` method implementation. Simply decorate your class with `[AutoByteStructure]` and make it `partial`, and the code generator creates the deserialization logic for you.
+
+### ByteSlide Utility
+The `ByteSlide` ref struct provides a safe, efficient way to parse binary data:
+- Tracks position automatically as you read bytes
+- Prevents reading past the buffer boundary
+- Uses `ReadOnlySpan<byte>` for zero-allocation performance
+- Supports both little-endian and big-endian byte order
+- Methods for reading primitive types, arrays, and strings
+
+### Attribute-Based Configuration
+* `[AutoByteStructure]` - Marks a class for code generation
+* `[AutoByteField]` - Configures array/byte field parsing with `Size` or `SizeFromProperty`
+* `[AutoByteString]` - Configures string field parsing (UTF-8)
+
+## Supported Data Types
+
+ByteSlide supports reading:
+- Primitive types: `byte`, `sbyte`, `short`, `ushort`, `int`, `uint`, `long`, `ulong`
+- Floating point: `float`, `double`
+- Enums (as their underlying type)
+- Strings (UTF-8)
+- Byte arrays
+- Nested structures (via `IByteStructure` interface)
+
+## API Reference
+
+### ByteSlide Methods
+- `Slide(int size)` - Read and advance by `size` bytes
+- `Skip(int size)` - Advance by `size` bytes without reading
+- `GetByte()` / `GetUInt16LittleEndian()` / `GetInt32LittleEndian()` - Read primitive types
+- `GetUtf8String(int length)` - Read UTF-8 string
+- `GetByteArray(int length)` - Read byte array
+- `GetStructure<T>()` - Parse nested structure
+
+### IByteStructure Interface
+Implement this interface to manually define deserialization logic:
+
+```csharp
+public interface IByteStructure
+{
+    int Deserialize(ref ByteSlide slide);
+}
+```
+
+Return value indicates bytes to skip (usually 0).
+
+## Project Structure
+
+- `AutoByte/` - Main library with attributes and ByteSlide implementation
+- `AutoByte.Generators/` - Source generator for automatic code generation
+- `AutoByte.Tests/` - Unit tests with examples
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2023 Matt Janda
+
+## Resources
 
 Byte icon was downloaded from [Flaticon](https://www.flaticon.com/free-icon/byte_5044438)
 
