@@ -353,8 +353,13 @@ namespace AutoByte
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T PeekStructure<T>() where T : IByteStructure, new()
         {
+            var slide = this;                  // Save the original state
+            
             var structure = new T();
-            structure.Deserialize(ref this);
+            structure.Deserialize(ref this);   // Deserialize (may modify this._slide)
+            
+            this = slide;                      // Restore the original state
+            
             return structure;
         }
     }
