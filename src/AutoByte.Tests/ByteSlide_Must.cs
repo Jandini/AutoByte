@@ -1,5 +1,6 @@
 ﻿using System.Buffers.Binary;
 using System.Text;
+using AutoByte.Tests.Structures;
 
 namespace AutoByte.Tests
 {
@@ -138,6 +139,82 @@ namespace AutoByte.Tests
 
             Assert.Equal(0, slide.Length);
 
+        }
+
+        /// <summary>
+        /// Test that demonstrates the PeekStructure bug.
+        /// 
+        /// BUG: PeekStructure is supposed to be non-destructive (like Stack.Peek or Queue.Peek),
+        /// but it advances the internal pointer due to passing `ref this` to Deserialize().
+        /// 
+        /// This test WILL FAIL with the current buggy implementation because:
+        /// 1. PeekStructure calls Deserialize(ref this), which advances the pointer
+        /// 2. GetStructure then reads from the ADVANCED position, not the original
+        /// 3. The signatures will differ (peeked reads correct bytes, actual reads garbage)
+        /// 
+        /// The test demonstrates "silent data corruption" - no exception is thrown,
+        /// the methods just return different results from the same data position.
+        /// </summary>
+        [Fact]
+        public void PeekStructure_ShouldNotAdvancePointer_BUG()
+        {
+            // ZIP header data: 0x50 0x4B 0x03 0x04 (signature PK\x03\x04)
+            var data = new byte[]
+            {
+                0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x00, 0x00, 0x08, 0x00, 0x63, 0x54,
+                0x96, 0x56, 0x45, 0x7F, 0x6A, 0xBD, 0x5B, 0x02, 0x00, 0x00, 0xF4, 0x08,
+                0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x41, 0x75, 0x74, 0x6F, 0x42, 0x79,
+                0x74, 0x65, 0x2E, 0x73, 0x6C, 0x6E
+            };
+
+            var slide = new ByteSlide(data);
+
+            // Peek at the structure (should NOT advance pointer)
+            var peeked = slide.PeekStructure<ZipFileHeader>();
+
+            // Now get the actual structure (should read from SAME position as peek)
+            var actual = slide.GetStructure<ZipFileHeader>();
+
+            // These should be IDENTICAL because peek should not advance the pointer
+            // If they differ, it proves the bug: peek advanced the pointer
+            Assert.Equal(peeked.Signature, actual.Signature);
+            Assert.Equal(peeked.VersionNeededToExtract, actual.VersionNeededToExtract);
+            Assert.Equal(peeked.GeneralPurposeBitFlag, actual.GeneralPurposeBitFlag);
+            Assert.Equal(peeked.CompressionMethod, actual.CompressionMethod);
+            Assert.Equal(peeked.LastModifiedFileTime, actual.LastModifiedFileTime);
+            Assert.Equal(peeked.LastModifiedFileDate, actual.LastModifiedFileDate);
+            Assert.Equal(peeked.Crc32, actual.Crc32);
+            Assert.Equal(peeked.CompressedSize, actual.CompressedSize);
+            Assert.Equal(peeked.UncompressedSize, actual.UncompressedSize);
+            Assert.Equal(peeked.FileNameLength, actual.FileNameLength);
+            Assert.Equal(peeked.ExtraFieldLength, actual.ExtraFieldLength);
+            Assert.Equal(peeked.FileName, actual.FileName);
+        }
+
+        /// <summary>
+        /// Test demonstrating that PeekString (non-generic method) works correctly.
+        /// This shows the pattern that Peek methods SHOULD follow: non-destructive reads.
+        /// </summary>
+        [Fact]
+        public void PeekString_DoesNotAdvancePointer()
+        {
+            byte[] data = {
+                0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x00
+            };
+
+            var slide = new ByteSlide(data);
+
+            // Peek at the string
+            string peeked = slide.PeekString(Encoding.ASCII, 5);
+            Assert.Equal("Hello", peeked);
+
+            // Read the string (should get same data)
+            string read = slide.GetString(Encoding.ASCII, 5);
+            Assert.Equal("Hello", read);
+
+            // If pointer wasn't advanced by peek, the next 6 bytes should be " World"
+            string next = slide.GetString(Encoding.ASCII, 6);
+            Assert.Equal(" World", next);
         }
 
 
