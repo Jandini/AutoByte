@@ -141,7 +141,53 @@ namespace AutoByte.Tests
         }
 
 
+        [Fact]
+        public void GetPascalString_WithMaxLength_ReturnsExpectedStrings_AndConsumesAllBytes()
+        {
+            // "Hello World" (11) + "Matt Janda" (10) + "" (0)
+            byte[] PASCAL_STRINGS =
+            {
+            0x0B, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64,
+            0x0A, 0x4D, 0x61, 0x74, 0x74, 0x20, 0x4A, 0x61, 0x6E, 0x64, 0x61,
+            0x00
+        };
 
-       
+            var slide = new ByteSlide(PASCAL_STRINGS);
+
+            // Full read (maxLength >= length)
+            Assert.Equal("Hello World", slide.GetPascalString(Encoding.ASCII, maxLength: 11));
+            Assert.Equal("Matt Janda", slide.GetPascalString(Encoding.ASCII, maxLength: 10));
+            Assert.Equal("", slide.GetPascalString(Encoding.ASCII, maxLength: 100));
+
+            Assert.Equal(0, slide.Length);
+        }
+
+        [Fact]
+        public void GetPascalString_WithMaxLength_TruncatesButStillSkipsRemainingBytes()
+        {
+            // "Hello World" (11) + "Matt Janda" (10) + "" (0)
+            byte[] PASCAL_STRINGS =
+            {
+            0x0B, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64,
+            0x0A, 0x4D, 0x61, 0x74, 0x74, 0x20, 0x4A, 0x61, 0x6E, 0x64, 0x61,
+            0x00
+        };
+
+            var slide = new ByteSlide(PASCAL_STRINGS);
+
+            // Truncate first string to 5 bytes => "Hello"
+            Assert.Equal("Hello", slide.GetPascalString(Encoding.ASCII, maxLength: 5));
+
+            // Must still be aligned to next Pascal string (i.e., remaining 6 bytes were skipped)
+            Assert.Equal("Matt Janda", slide.GetPascalString(Encoding.ASCII, maxLength: 10));
+
+            // Empty
+            Assert.Equal("", slide.GetPascalString(Encoding.ASCII, maxLength: 1));
+
+            Assert.Equal(0, slide.Length);
+        }
+
+
+
     }
 }

@@ -21,7 +21,7 @@ namespace AutoByte
 
         public static string GetNamespace(this BaseTypeDeclarationSyntax syntax)
         {
-            // Get the syntax node for the containing namespace declaration
+            // Get the syntax node for the containing namespace declaration (traditional namespace)
             SyntaxNode containingNamespace = syntax.AncestorsAndSelf()
                 .OfType<NamespaceDeclarationSyntax>().FirstOrDefault();
 
@@ -29,6 +29,16 @@ namespace AutoByte
             {
                 // Get the namespace name from the syntax node
                 return ((NamespaceDeclarationSyntax)containingNamespace).Name.ToString();
+            }
+
+            // Check for file-scoped namespace declaration (C# 10+)
+            SyntaxNode containingFileScopedNamespace = syntax.AncestorsAndSelf()
+                .OfType<FileScopedNamespaceDeclarationSyntax>().FirstOrDefault();
+
+            if (containingFileScopedNamespace != null)
+            {
+                // Get the namespace name from the file-scoped namespace node
+                return ((FileScopedNamespaceDeclarationSyntax)containingFileScopedNamespace).Name.ToString();
             }
 
             return null;

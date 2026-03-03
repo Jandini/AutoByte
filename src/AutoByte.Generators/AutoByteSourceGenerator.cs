@@ -189,7 +189,6 @@ namespace AutoByte
                 }
             }
 
-
             throw new Exception($"Propertry {property.Name} require AutoByteString attribute.");          
         }
 

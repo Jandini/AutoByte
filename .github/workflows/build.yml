@@ -8,9 +8,9 @@ env:
 
 on:
   push:
-    branches: '*'
-  pull_request:
-    branches: 'main'
+    branches: [ '*' ] 
+#  pull_request:
+#    branches: [ 'main' ] 
 
 defaults:
   run:
@@ -30,15 +30,16 @@ jobs:
     - name: Setup
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
         source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
 
     - name: Pack
-      run: dotnet pack -c:Release
+      run: dotnet pack -c:Release -o nuget
 
     - name: Test
       run: dotnet test
 
     - name: Push
-      if: github.ref == 'refs/heads/main'
-      run: dotnet nuget push "../bin/Release/*.nupkg" -k ${{ secrets.PACKAGE_REGISTRY_TOKEN }} -s https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --skip-duplicate
+      # Create packages from every branch except pull requests
+      if: github.event_name == 'push' && contains(github.event.head_commit.message, 'prerelease')
+      run: dotnet nuget push "nuget/*.nupkg" -k ${{ secrets.NUGET_ORG_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
